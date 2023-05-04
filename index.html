@@ -3,10 +3,175 @@
         <meta charset="utf-8" />
         <title>Project 3</title>
         <script src="https://d3js.org/d3.v7.min.js"></script>
+        <style>
+            .outline{
+                border: 1px solid black;
+            }
+            .gridlines line {
+                stroke: #bbb;
+            }
+            .gridlines .domain {
+                stroke: none;
+            }
+
+        </style>
     </head>
 
     <body> 
         <h1> Insert Title </h1>
+        <p> Body text. </p>
+        <svg class="outline" id="tuition" width="200" height="200"> </svg>
+        <svg class="outline" id="debt" width="200" height="200"> </svg>
+        <svg class="outline" id="earnings" width="200" height="200"> </svg>
+        <svg class="outline" id="admission" width="200" height="200"> </svg>
+        <svg id="scatter" width="800" height="800"> </svg>
+        <script>
+            const createGraph = async function () {
+                let ivies = await d3.csv("ivies.csv", d3.autoType);
+                let rest = await d3.csv("rest.csv", d3.autoType);
+
+                console.log(ivies);
+                console.log(rest);
+
+                // eventually make the code below into a function we can just repeat for the 4 histograms
+
+                function makeHistogram(svg, attribute) {
+
+                    const histo = d3.select(svg);
+                    const width = histo.attr("width");
+                    const height = histo.attr("height");
+                    const histoMargin = {top: 10, right: 20, bottom: 20, left: 30};
+                    const histoWidth = width - histoMargin.right - histoMargin.left;
+                    const histoHeight = height - histoMargin.top - histoMargin.bottom;
+
+                    let annotations = histo.append("g").attr("id","annotations");
+                    let histoArea = histo.append("g").attr("id","bars")
+                        .attr("transform","translate("+histoMargin.left+","+histoMargin.top+")");
+                    
+                    // histograms 
+                    let values = rest.map(d => d[attribute]);
+                    let minMax = d3.extent(values);
+
+                    let xScale = d3.scaleLinear().domain( minMax )
+                                        .range([0, histoWidth]); 
+                    let bottomAxis = d3.axisBottom(xScale).tickFormat("");
+
+                    let numBins = 10;
+                    let histoGen = d3.histogram().domain( minMax )
+                                                .thresholds( numBins );
+                    console.log(histoGen);
+                    let bins = histoGen(values);
+                    console.log(bins);
+                    // do we need to use this?
+                    // bins.unshift({ x0: 0,
+                    //            x1: bins[0].x0,
+                    //            length: bins[0].length });
+
+                    let yScale = d3.scaleLinear().domain( d3.extent(bins, d=>d.length) )
+                                        .range([histoHeight, 0]); 
+                    
+                    let leftAxis = d3.axisLeft(yScale);
+                    let leftGridlines = d3.axisLeft(yScale)
+                                .tickSize(-histoWidth-10)
+                                .tickFormat("")
+                    
+                    annotations.append("g")
+                                .attr("class", "y axis")
+                                .attr("transform","translate("+(histoMargin.left-10)+","+histoMargin.top+")")
+                                .call(leftAxis)
+                    annotations.append("g")
+                                .attr("class", "y gridlines")
+                                .attr("transform","translate("+(histoMargin.left-10)+","+histoMargin.top+")")
+                                .call(leftGridlines);
+                    annotations.append("g")
+                                .attr("class", "x axis")
+                                .attr("transform","translate("+(histoMargin.left-10)+","+(histoHeight+histoMargin.top)+")")
+                                .call(bottomAxis);
+
+                    // let area = d3.area().x(d => xScale(d.x1))
+                    //                     .y0(yScale(0))
+                    //                     .y1(d => yScale(d.length))
+                    //                     .curve(d3.curveNatural);
+
+                    // histoArea.append("path").datum(bins)
+                    //     .attr("class", "area")
+                    //     .attr("d", area);
+
+                    histoArea.selectAll("rect")
+                                .data(bins)
+                                .join( enter => enter.append("rect")
+                                            .attr("x", d => xScale(d.x1))
+                                            .attr("y", d => yScale(d.length))
+                                            .attr("width", function(d) { return xScale(d.x1) - xScale(d.x0) -1 ; })
+                                            .attr("height", function(d) { return histoHeight - yScale(d.length); })
+                                            .style("fill", "#69b3a2")
+                                            .style("stroke", "black"));
+                }
+
+                makeHistogram("#tuition", "COSTT4_A");
+                makeHistogram("#debt", "GRAD_DEBT_MDN");
+                makeHistogram("#earnings", "MD_EARN_WNE_P10");
+                makeHistogram("#admission", "ADM_RATE");
+
+                let scatter = d3.select("#scatter");
+                const swidth = scatter.attr("width");
+                const sheight = scatter.attr("height");
+                const sMargin = {top: 10, right: 20, bottom: 40, left: 60};
+                const sChartWidth = swidth - sMargin.right - sMargin.left;
+                const sChartHeight = sheight - sMargin.top - sMargin.bottom;
+
+                let annotations = scatter.append("g").attr("id","annotations");
+                let scatterArea = scatter.append("g").attr("id","points")
+                    .attr("transform","translate("+sMargin.left+","+sMargin.top+")");
+
+                // whatever variables the user chooses, need to adjust this code to deal with the variables that the user can choose
+                // maybe create it's own function that reacts to what the user inputs
+                const xExtent = d3.extent(rest, d => d["ADM_RATE"] );
+                const yExtent = d3.extent(rest, d => d["COSTT4_A"] );
+                
+                const xScale = d3.scaleLinear().domain(xExtent).range([0, sChartWidth]);
+                // switching min and max to account for SVG coordinates
+                const yScale = d3.scaleLinear().domain(yExtent).range([sChartHeight, 0]);
+                // part C
+                // left axis
+                let sLeftAxis = d3.axisLeft(yScale);
+                scatter.append('g')
+                    .attr('class', 'y axis')
+                    .attr('transform',`translate(${sMargin.left-10},${sMargin.top})`) 
+                    .call(sLeftAxis);
+                // left gridlines
+                let sLeftGridlines = d3.axisLeft(yScale).tickSize(-sChartWidth-10).tickFormat("");
+                scatter.append('g')
+                    .attr('class', 'y gridlines')
+                    .attr('transform',`translate(${sMargin.left-10},${sMargin.top})`)
+                    .call(sLeftGridlines);
+                // bottom axis
+                let sBottomAxis = d3.axisBottom(xScale);
+                scatter.append('g')
+                    .attr('class', 'x axis')
+                    .attr('transform',`translate(${sMargin.left},${sChartHeight+sMargin.top+10})`)
+                    .call(sBottomAxis);
+                // bottom gridlines
+                let sBottomGridlines = d3.axisBottom(xScale).tickSize(-sChartHeight-10).tickFormat("");
+                scatter.append('g')
+                    .attr('class','x gridlines')
+                    .attr('transform',`translate(${sMargin.left},${sChartHeight+sMargin.top+10})`)
+                    .call(sBottomGridlines);
+
+                scatterArea.selectAll("circle.point").data(rest)
+                            .join("circle")
+                            .attr("class", "point")
+                            .attr("cx", d => xScale(d['ADM_RATE']))
+                            .attr("cy", d => yScale(d['COSTT4_A']))
+                            .attr("r", 5)
+                            .attr("fill", "blue");
+
+
+            }
+            createGraph();
+
+        </script>
+
     </body>
 
 
