@@ -7,8 +7,9 @@
       body{
         font-family: 'Georgia';
       }
-      .outline {
-        border: 1px solid black;
+      .histo{
+        background-color: #bbb;
+        margin: 10px;
       }
       .gridlines line {
         stroke: #bbb;
@@ -56,19 +57,35 @@
         display: flex;
         align-items: flex-end;
       }
-
-      .col-1 {
+      .histo-section{
+        display: flex;
+        flex-direction: row;
       }
+      .histos{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+      .histo-text{
+        width: 50%;
+      }
+
     </style>
   </head>
 
   <body>
     <h1>A Study of the Top Universities in the United States</h1>
-    <p>Body text.</p>
-    <svg class="outline" id="tuition" width="200" height="200"></svg>
-    <svg class="outline" id="debt" width="200" height="200"></svg>
-    <svg class="outline" id="earnings" width="200" height="200"></svg>
-    <svg class="outline" id="admission" width="200" height="200"></svg>
+    <div class="histo-section">
+        <div class="histo-text">
+            <p>Describe histograms here.</p>
+        </div>
+        <div class="histos">
+            <svg class="histo" id="tuition" width="300" height="300"></svg>
+            <svg class="histo" id="debt" width="300" height="300"></svg>
+            <svg class="histo" id="earnings" width="300" height="300"></svg>
+            <svg class="histo" id="admission" width="300" height="300"></svg>
+        </div>
+    </div>
 
     <div class="scatter-container">
       <div class="col-1 col">
@@ -185,7 +202,7 @@
             scatter.select("#scatterYGrid").transition().duration(500).call(sLeftGridlines);
 
             scatterArea
-                    .selectAll("circle.point")
+                    .selectAll("circle")
                     .data(total)
                     .join( (enter) => 
                         enter.append("circle")
@@ -206,120 +223,104 @@
 
         // eventually make the code below into a function we can just repeat for the 4 histograms
 
-        function makeHistogram(svg, attribute) {
-          const histo = d3.select(svg);
-          const width = histo.attr("width");
-          const height = histo.attr("height");
-          const histoMargin = { top: 10, right: 20, bottom: 20, left: 30 };
-          const histoWidth = width - histoMargin.right - histoMargin.left;
-          const histoHeight = height - histoMargin.top - histoMargin.bottom;
+        function makeHistogram(svg, attribute, xlabel) {
+            const histo = d3.select(svg);
+            const width = histo.attr("width");
+            const height = histo.attr("height");
+            const histoMargin = { top: 10, right: 20, bottom: 60, left: 30 };
+            const histoWidth = width - histoMargin.right - histoMargin.left;
+            const histoHeight = height - histoMargin.top - histoMargin.bottom;
 
-          let annotations = histo.append("g").attr("id", "annotations");
-          let histoArea = histo
-            .append("g")
-            .attr("id", "bars")
-            .attr(
-              "transform",
-              "translate(" + histoMargin.left + "," + histoMargin.top + ")"
-            );
+            let annotations = histo.append("g").attr("id", "annotations");
+            let histoArea = histo.append("g").attr("id", "bars")
+                                            .attr(
+                                            "transform",
+                                            "translate(" + (histoMargin.left) + "," + histoMargin.top + ")"
+                                            );
 
-          // histograms
-          let values = rest.map((d) => d[attribute]);
-          let minMax = d3.extent(values);
+            // histograms
+            let rest_values = rest.map((d) => d[attribute]);
+            let rest_minMax = d3.extent(rest_values);
+            let ivy_values = ivies.map((d) => d[attribute]);
 
-          let xScale = d3.scaleLinear().domain(minMax).range([0, histoWidth]);
-          let bottomAxis = d3.axisBottom(xScale).tickFormat("");
+            let xScale = d3.scaleLinear().domain(rest_minMax).range([0, histoWidth]);
+            let bottomAxis = d3.axisBottom(xScale);
 
-          let numBins = 10;
-          let histoGen = d3.histogram().domain(minMax).thresholds(numBins);
-          //console.log(histoGen);
-          let bins = histoGen(values);
-          //console.log(bins);
-          // do we need to use this?
-          // bins.unshift({ x0: 0,
-          //            x1: bins[0].x0,
-          //            length: bins[0].length });
+            let numBins = 10;
+            let histoGen = d3.histogram().domain(rest_minMax).thresholds(numBins);
 
-          let yScale = d3
-            .scaleLinear()
-            .domain(d3.extent(bins, (d) => d.length))
-            .range([histoHeight, 0]);
+            let rest_bins = histoGen(rest_values);
+            console.log("rest histo", rest_bins)
+            let ivy_bins = histoGen(ivy_values);
+            console.log("ivy histo", ivy_bins);
 
-          let leftAxis = d3.axisLeft(yScale);
-          let leftGridlines = d3
-            .axisLeft(yScale)
-            .tickSize(-histoWidth - 10)
-            .tickFormat("");
+            // y axis 
+            let yScale = d3.scaleLinear().domain(d3.extent(rest_bins, (d) => d.length))
+                                                    .range([histoHeight, 0]);
 
-          annotations
-            .append("g")
-            .attr("class", "y axis")
-            .attr(
-              "transform",
-              "translate(" +
-                (histoMargin.left - 10) +
-                "," +
-                histoMargin.top +
-                ")"
-            )
-            .call(leftAxis);
-          annotations
-            .append("g")
-            .attr("class", "y gridlines")
-            .attr(
-              "transform",
-              "translate(" +
-                (histoMargin.left - 10) +
-                "," +
-                histoMargin.top +
-                ")"
-            )
-            .call(leftGridlines);
-          annotations
-            .append("g")
-            .attr("class", "x axis")
-            .attr(
-              "transform",
-              "translate(" +
-                (histoMargin.left - 10) +
-                "," +
-                (histoHeight + histoMargin.top) +
-                ")"
-            )
-            .call(bottomAxis);
+            let leftAxis = d3.axisLeft(yScale);
+            let leftGridlines = d3.axisLeft(yScale).tickSize(-histoWidth - 10).tickFormat("");
 
-          // let area = d3.area().x(d => xScale(d.x1))
-          //                     .y0(yScale(0))
-          //                     .y1(d => yScale(d.length))
-          //                     .curve(d3.curveNatural);
+            annotations.append("g").attr("class", "y axis")
+                                .attr("transform","translate(" +(histoMargin.left - 10) +"," +histoMargin.top +")")
+                                .call(leftAxis);
+            
+            annotations.append("g").attr("class", "y gridlines")
+                            .attr("transform","translate(" +(histoMargin.left - 10) +"," +histoMargin.top +")")
+                            .call(leftGridlines);
+            
+            annotations.append("g").attr("class", "x axis")
+                            .attr("transform","translate(" +(histoMargin.left) +"," +(histoHeight + histoMargin.top) +")")
+                            .call(bottomAxis)
+                            .selectAll("text") 
+                            .style("text-anchor", "end")
+                            .attr("transform", "translate(-10, 2) rotate(-65)");
 
-          // histoArea.append("path").datum(bins)
-          //     .attr("class", "area")
-          //     .attr("d", area);
+            let rest_rectangles = histoArea.selectAll("rect.rest").data(rest_bins)
+                    .join("rect")
+                    .attr("class", "rest")
+                    .attr("x", (d) => xScale(d.x0))
+                    .attr("y", (d) => yScale(d.length))
+                    .attr("width", function (d) {
+                        return xScale(d.x1) - xScale(d.x0);
+                    })
+                    .attr("height", function (d) {
+                        return histoHeight - yScale(d.length);
+                    })
+                    .style("fill", "blue")
+                    .style("stroke", "black")
+                    .style("stroke-width", 1)
+                    .style("opacity", 0.9);
 
-          histoArea
-            .selectAll("rect")
-            .data(bins)
-            .join((enter) =>
-              enter
-                .append("rect")
-                .attr("x", (d) => xScale(d.x1))
-                .attr("y", (d) => yScale(d.length))
-                .attr("width", function (d) {
-                  return xScale(d.x1) - xScale(d.x0) - 1;
-                })
-                .attr("height", function (d) {
-                  return histoHeight - yScale(d.length);
-                })
-                .style("fill", "#69b3a2")
-                .style("stroke", "black")
-            );
+            let ivy_rectangles = histoArea.selectAll("rect.ivy").data(ivy_bins)
+                    .join("rect")
+                    .attr("class", "ivy")
+                    .attr("x", (d) => xScale(d.x0))
+                    .attr("y", (d) => yScale(d.length))
+                    .attr("width", function (d) {
+                        return xScale(d.x1) - xScale(d.x0);
+                    })
+                    .attr("height", function (d) {
+                        return histoHeight - yScale(d.length);
+                    })
+                    .style("fill", "gold")
+                    .style("stroke", "black")
+                    .style("stroke-width", 1)
+                    .style("opacity", 0.9);
+
+            annotations.append("text")
+                .attr("class", "x label")
+                .attr("text-anchor", "middle")
+                .attr("x", (histoWidth / 2) + histoMargin.left)
+                .attr("y", histoHeight + histoMargin.bottom)
+                .text(xlabel);
+            
         }
 
-        makeHistogram("#tuition", "COSTT4_A");
-        makeHistogram("#debt", "GRAD_DEBT_MDN");
-        makeHistogram("#earnings", "MD_EARN_WNE_P10");
-        makeHistogram("#admission", "ADM_RATE");
+        makeHistogram("#tuition", "COSTT4_A", "Average Annual Cost");
+        makeHistogram("#debt", "GRAD_DEBT_MDN", "Median Debt");
+        makeHistogram("#earnings", "MD_EARN_WNE_P10", "Median Earnings");
+        makeHistogram("#admission", "ADM_RATE", "Admission Rate");
         makeScatter(3,0);
 
 
