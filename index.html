@@ -69,11 +69,17 @@
       .histo-text {
         width: 50%;
       }
+      header{
+        height: 800px;
+      }
     </style>
   </head>
 
   <body>
-    <h1>A Study of the Top Universities in the United States</h1>
+    <header> 
+        <h1>A Study of the Top Universities in the United States</h1>
+        <img></img>
+    </header>
     <div class="histo-section">
       <div class="histo-text">
         <p>Describe histograms here.</p>
@@ -270,8 +276,6 @@
             firstLoad = false;
           }
         }
-
-        // eventually make the code below into a function we can just repeat for the 4 histograms
 
         function makeHistogram(svg, attribute, xlabel) {
           const histo = d3.select(svg);
