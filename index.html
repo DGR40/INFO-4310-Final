@@ -114,12 +114,23 @@
 
       #detail-table {
         visibility: hidden;
+      header{
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background-image: url('ivy_resized.png');
+      }
+      h1{
+        color: black;
       }
     </style>
   </head>
 
   <body>
-    <h1>A Study of the Top Universities in the United States</h1>
+    <header>
+      <h1>A Study of the Top Universities in the United States</h1>
+    </header>
     <div class="histo-section">
       <div class="histo-text">
         <p>Describe histograms here.</p>
@@ -382,8 +393,6 @@
             firstLoad = false;
           }
         }
-
-        // eventually make the code below into a function we can just repeat for the 4 histograms
 
         function makeHistogram(svg, attribute, xlabel) {
           const histo = d3.select(svg);
