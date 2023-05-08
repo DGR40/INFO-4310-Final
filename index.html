@@ -45,19 +45,22 @@
         transform: rotate(180deg);
       }
 
-      /* .yButtonContainer {
-        display: flex;
-        flex-direction: row;
-      } */
-
       .scatter-container {
         display: flex;
+      }
+
+      .col-3 {
+        display: flex;
+        align-items: flex-end;
+      }
+
+      .col-1 {
       }
     </style>
   </head>
 
   <body>
-    <h1> A Study of the Top Universities in the United States </h1>
+    <h1>A Study of the Top Universities in the United States</h1>
     <p>Body text.</p>
     <svg class="outline" id="tuition" width="200" height="200"></svg>
     <svg class="outline" id="debt" width="200" height="200"></svg>
@@ -65,20 +68,24 @@
     <svg class="outline" id="admission" width="200" height="200"></svg>
 
     <div class="scatter-container">
-      <div>
+      <div class="col-1 col">
         <div class="yButtonContainer">
           <span class="arrow arrow-left" id="yArrowLeft"></span>
           <button class="button" id="yButton">Cost</button>
           <span class="arrow" id="yArrowRight"></span>
         </div>
+      </div>
 
+      <div class="col col-2">
         <svg id="scatter" width="800" height="800"></svg>
       </div>
 
-      <div>
-        <span class="arrow arrow-left" id="xArrowLeft"></span>
-        <button id="xButton" class="button">Admission Rate</button>
-        <span class="arrow" id="xArrowRight"></span>
+      <div class="col col-3">
+        <div class="xButtonContainer">
+          <span class="arrow arrow-left" id="xArrowLeft"></span>
+          <button id="xButton" class="button">Admission Rate</button>
+          <span class="arrow" id="xArrowRight"></span>
+        </div>
       </div>
     </div>
 
@@ -104,8 +111,38 @@
         var xAxis = d3.axisBottom().scale(newXScale);
         var yAxis = d3.axisLeft().scale(newYScale);
 
+        // left gridlines
+        let sLeftGridlines = d3
+          .axisLeft(newYScale)
+          .tickSize(-720 - 10)
+          .tickFormat("");
+
+        // bottom gridlines
+        let sBottomGridlines = d3
+          .axisBottom(newXScale)
+          .tickSize(-750, 0)
+          .tickFormat("");
+
+        svg
+          .select(".scatterYGridlines")
+          .transition()
+          .duration(500)
+          .call(sLeftGridlines);
+
+        svg
+          .select(".scatterXGridlines")
+          .transition()
+          .duration(500)
+          .call(sBottomGridlines);
+
+        console.log(svg.select("#scatterXAxis"));
+
+        // update axes
+
         svg.select("#scatterXAxis").transition().duration(500).call(xAxis);
-        svg.select("#scatterYAxis").transition().duration(500).call(yAxis);
+        svg.select(".scatterYAxis").transition().duration(500).call(yAxis);
+
+        // update gridlines
 
         d3.selectAll("circle")
           .transition()
@@ -292,7 +329,7 @@
           .tickFormat("");
         scatter
           .append("g")
-          .attr("class", "y gridlines")
+          .attr("class", "scatterYGridlines y gridlines")
           .attr("transform", `translate(${sMargin.left - 10},${sMargin.top})`)
           .call(sLeftGridlines);
         // bottom axis
@@ -313,7 +350,7 @@
           .tickFormat("");
         scatter
           .append("g")
-          .attr("class", "x gridlines")
+          .attr("class", "x gridlines scatterXGridlines")
           .attr(
             "transform",
             `translate(${sMargin.left},${sChartHeight + sMargin.top + 10})`
@@ -328,7 +365,10 @@
           .attr("cx", (d) => xScale(d["ADM_RATE"]))
           .attr("cy", (d) => yScale(d["COSTT4_A"]))
           .attr("r", 5)
-          .attr("fill", "blue");
+          .attr("fill", "blue")
+          .on("hover", function (d) {
+            console.log(d["INSTNM"]);
+          });
       };
 
       let xLabel = document.getElementById("xButton");
