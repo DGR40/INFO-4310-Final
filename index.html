@@ -93,37 +93,6 @@
     </div>
 
     <script>
-      // function to update the chart based on the selected variables
-    //   async function updateChart() {
-    //     let data = await d3.csv("rest.csv", d3.autoType);
-    //     let svg = d3.select("#scatter");
-    //     console.log("running update chart");
-    //     console.log(data);
-    //     var xVariable = varLabels[xLabelIndex];
-    //     var yVariable = varLabels[yLabelIndex];
-
-    //     console.log("X", xVariable);
-    //     console.log("Y", yVariable);
-
-    //     const newXExtent = d3.extent(data, (d) => d[xVariable]);
-    //     const newYExtent = d3.extent(data, (d) => d[yVariable]);
-
-    //     const newXScale = d3.scaleLinear().domain(newXExtent).range([0, 720]);
-    //     const newYScale = d3.scaleLinear().domain(newYExtent).range([750, 0]);
-
-    //     var xAxis = d3.axisBottom().scale(newXScale);
-    //     var yAxis = d3.axisLeft().scale(newYScale);
-
-    //     svg.select("#scatterXAxis").transition().duration(500).call(xAxis);
-    //     svg.select("#scatterYAxis").transition().duration(500).call(yAxis);
-
-    //     d3.selectAll("circle")
-    //       .transition()
-    //       .duration(500)
-    //       .attr("cx", (d) => newXScale(d[xVariable]))
-    //       .attr("cy", (d) => newYScale(d[yVariable]));
-    //   }
-
       // Define the initial button label and index of the label array
     var buttonLabels = ["Cost", "Debt", "Median Earnings", "Admission Rate"];
 
@@ -137,9 +106,8 @@
     const createGraph = async function () {
         let ivies = await d3.csv("ivies.csv", d3.autoType);
         let rest = await d3.csv("rest.csv", d3.autoType);
-
-        console.log(ivies);
-        console.log(rest);
+        let total = await d3.csv("top_data.csv", d3.autoType);
+        console.log(total);
 
         function makeScatter(xIndex, yIndex){
             const scatter = d3.select("#scatter");
@@ -161,8 +129,8 @@
 
             // whatever variables the user chooses, need to adjust this code to deal with the variables that the user can choose
             // maybe create it's own function that reacts to what the user inputs
-            const xExtent = d3.extent(rest, (d) => d[xVariable]);
-            const yExtent = d3.extent(rest, (d) => d[yVariable]);
+            const xExtent = d3.extent(total, (d) => d[xVariable]);
+            const yExtent = d3.extent(total, (d) => d[yVariable]);
 
             const xScale = d3.scaleLinear().domain(xExtent).range([0, sChartWidth]);
             // switching min and max to account for SVG coordinates
@@ -218,14 +186,20 @@
 
             scatterArea
                     .selectAll("circle.point")
-                    .data(rest)
+                    .data(total)
                     .join( (enter) => 
                         enter.append("circle")
                         .attr("class", "point")
                         .attr("cx", (d) => xScale(d[xVariable]))
                         .attr("cy", (d) => yScale(d[yVariable]))
-                        .attr("r", 5)
-                        .attr("fill", "blue"))
+                        .attr("r", 5))
+                        .attr("fill", (d) => {
+                            if (d['ivy'] === "True") {
+                                return "gold"
+                            }
+                            else {
+                                return "blue"
+                            }})
                     .transition()
                     .duration(500);
         }
