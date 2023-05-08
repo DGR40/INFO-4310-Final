@@ -54,7 +54,31 @@
         align-items: flex-end;
       }
 
+      .col-2 {
+        display: flex;
+        flex: 8;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
       .col-1 {
+        display: flex;
+        align-items: center;
+        height: 200px;
+        width: 200px;
+      }
+
+      .xButtonContainer {
+        margin-left: 100px;
+      }
+
+      .yButtonContainer {
+        transform: rotate(270deg);
+        height: 50px;
+        width: 250px;
+        display: flex;
+        align-items: center;
       }
     </style>
   </head>
@@ -67,6 +91,7 @@
     <svg class="outline" id="earnings" width="200" height="200"></svg>
     <svg class="outline" id="admission" width="200" height="200"></svg>
 
+    <h1>The Top 100 Universities</h1>
     <div class="scatter-container">
       <div class="col-1 col">
         <div class="yButtonContainer">
@@ -77,10 +102,7 @@
       </div>
 
       <div class="col col-2">
-        <svg id="scatter" width="800" height="800"></svg>
-      </div>
-
-      <div class="col col-3">
+        <svg id="scatter" width="1100" height="800"></svg>
         <div class="xButtonContainer">
           <span class="arrow arrow-left" id="xArrowLeft"></span>
           <button id="xButton" class="button">Admission Rate</button>
@@ -357,18 +379,21 @@
           )
           .call(sBottomGridlines);
 
+        const sizeExtent = d3.extent(rest, (d) => d["UG12MN"]);
+
+        const sizeScale = d3.scaleLinear().domain(sizeExtent).range([3, 10]);
+
         scatterArea
           .selectAll("circle.point")
           .data(rest)
           .join("circle")
           .attr("class", "point")
+          .attr("name", (d) => d["INSTNM"])
           .attr("cx", (d) => xScale(d["ADM_RATE"]))
           .attr("cy", (d) => yScale(d["COSTT4_A"]))
-          .attr("r", 5)
+          .attr("r", (d) => sizeScale(d["UG12MN"]))
           .attr("fill", "blue")
-          .on("hover", function (d) {
-            console.log(d["INSTNM"]);
-          });
+          .on("mouseover", mouseOver);
       };
 
       let xLabel = document.getElementById("xButton");
@@ -415,6 +440,12 @@
         yLabel.textContent = buttonLabels[yLabelIndex];
         updateChart();
       });
+
+      function mouseOver(event, d) {
+        let point = d3.select(this);
+        console.log("mouseover", point.attr("name"));
+        point.attr("r", point.attr("r") * 1.2);
+      }
 
       createGraph();
     </script>
