@@ -249,6 +249,7 @@
             let numBins = 10;
             let histoGen = d3.histogram().domain(rest_minMax).thresholds(numBins);
 
+            // the smaller rectangles are from the fact that it's not even distribution in the bins right?
             let rest_bins = histoGen(rest_values);
             console.log("rest histo", rest_bins)
             let ivy_bins = histoGen(ivy_values);
@@ -290,7 +291,9 @@
                     .style("fill", "blue")
                     .style("stroke", "black")
                     .style("stroke-width", 1)
-                    .style("opacity", 0.9);
+                    .style("opacity", 1.0)
+                    .on("mouseover", mouseOverRect)
+                    .on("mouseout", mouseOutRect);
 
             let ivy_rectangles = histoArea.selectAll("rect.ivy").data(ivy_bins)
                     .join("rect")
@@ -306,16 +309,33 @@
                     .style("fill", "gold")
                     .style("stroke", "black")
                     .style("stroke-width", 1)
-                    .style("opacity", 0.9);
+                    .style("opacity", 1.0)
+                    .on("mouseover", mouseOverRect)
+                    .on("mouseout", mouseOutRect);
 
             annotations.append("text")
                 .attr("class", "x label")
                 .attr("text-anchor", "middle")
                 .attr("x", (histoWidth / 2) + histoMargin.left)
                 .attr("y", histoHeight + histoMargin.bottom)
-                .text(xlabel);
-            
+                .text(xlabel);    
         }
+
+        // QUESTION - is there a way to recover the data points that fall into each point? Like if we want to show list of colleges
+        function mouseOverRect(event, d){
+            let obj = d3.select(this);
+            let number = d.length;
+            obj.style("stroke-width", 3);
+
+            // how would I show the number of schools and which ones?
+
+
+        }
+        function mouseOutRect(event, d){
+            let obj = d3.select(this);
+            obj.style("stroke-width", 1);
+
+        };
 
         makeHistogram("#tuition", "COSTT4_A", "Average Annual Cost");
         makeHistogram("#debt", "GRAD_DEBT_MDN", "Median Debt");
