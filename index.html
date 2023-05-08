@@ -4,10 +4,10 @@
     <title>Project 3</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
-      body{
-        font-family: 'Georgia';
+      body {
+        font-family: "Georgia";
       }
-      .histo{
+      .histo {
         background-color: #bbb;
         margin: 10px;
       }
@@ -57,34 +57,33 @@
         display: flex;
         align-items: flex-end;
       }
-      .histo-section{
+      .histo-section {
         display: flex;
         flex-direction: row;
       }
-      .histos{
+      .histos {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
       }
-      .histo-text{
+      .histo-text {
         width: 50%;
       }
-
     </style>
   </head>
 
   <body>
     <h1>A Study of the Top Universities in the United States</h1>
     <div class="histo-section">
-        <div class="histo-text">
-            <p>Describe histograms here.</p>
-        </div>
-        <div class="histos">
-            <svg class="histo" id="tuition" width="300" height="300"></svg>
-            <svg class="histo" id="debt" width="300" height="300"></svg>
-            <svg class="histo" id="earnings" width="300" height="300"></svg>
-            <svg class="histo" id="admission" width="300" height="300"></svg>
-        </div>
+      <div class="histo-text">
+        <p>Describe histograms here.</p>
+      </div>
+      <div class="histos">
+        <svg class="histo" id="tuition" width="300" height="300"></svg>
+        <svg class="histo" id="debt" width="300" height="300"></svg>
+        <svg class="histo" id="earnings" width="300" height="300"></svg>
+        <svg class="histo" id="admission" width="300" height="300"></svg>
+      </div>
     </div>
 
     <div class="scatter-container">
@@ -111,220 +110,311 @@
 
     <script>
       // Define the initial button label and index of the label array
-    var buttonLabels = ["Cost", "Debt", "Median Earnings", "Admission Rate"];
+      var buttonLabels = ["Cost", "Debt", "Median Earnings", "Admission Rate"];
 
-    var varLabels = [
+      var varLabels = [
         "COSTT4_A",
         "GRAD_DEBT_MDN",
         "MD_EARN_WNE_P10",
         "ADM_RATE",
-    ];
+      ];
 
-    const createGraph = async function () {
+      var firstLoad = true;
+
+      const createGraph = async function () {
         let ivies = await d3.csv("ivies.csv", d3.autoType);
         let rest = await d3.csv("rest.csv", d3.autoType);
         let total = await d3.csv("top_data.csv", d3.autoType);
         console.log(total);
 
-        function makeScatter(xIndex, yIndex){
-            const scatter = d3.select("#scatter");
-            const swidth = scatter.attr("width");
-            const sheight = scatter.attr("height");
-            const sMargin = { top: 10, right: 20, bottom: 40, left: 60 };
-            const sChartWidth = swidth - sMargin.right - sMargin.left;
-            const sChartHeight = sheight - sMargin.top - sMargin.bottom;
+        function makeScatter(xIndex, yIndex) {
+          const scatter = d3.select("#scatter");
+          const swidth = scatter.attr("width");
+          const sheight = scatter.attr("height");
+          const sMargin = { top: 10, right: 20, bottom: 40, left: 60 };
+          const sChartWidth = swidth - sMargin.right - sMargin.left;
+          const sChartHeight = sheight - sMargin.top - sMargin.bottom;
 
-            var xVariable = varLabels[xIndex];
-            var yVariable = varLabels[yIndex];
+          var xVariable = varLabels[xIndex];
+          var yVariable = varLabels[yIndex];
 
-            //console.log(sChartHeight, sChartWidth);
+          //console.log(sChartHeight, sChartWidth);
 
-            let annotations = scatter.append("g").attr("id", "annotations");
-            let scatterArea = scatter.append("g")
-                                .attr("id", "points")
-                                .attr("transform","translate(" + sMargin.left + "," + sMargin.top + ")");       
+          let annotations = scatter.append("g").attr("id", "annotations");
+          let scatterArea = scatter
+            .append("g")
+            .attr("id", "points")
+            .attr(
+              "transform",
+              "translate(" + sMargin.left + "," + sMargin.top + ")"
+            );
 
-            // whatever variables the user chooses, need to adjust this code to deal with the variables that the user can choose
-            // maybe create it's own function that reacts to what the user inputs
-            const xExtent = d3.extent(total, (d) => d[xVariable]);
-            const yExtent = d3.extent(total, (d) => d[yVariable]);
+          // whatever variables the user chooses, need to adjust this code to deal with the variables that the user can choose
+          // maybe create it's own function that reacts to what the user inputs
+          const xExtent = d3.extent(total, (d) => d[xVariable]);
+          const yExtent = d3.extent(total, (d) => d[yVariable]);
+          const rExtent = d3.extent(total, (d) => d["UGDS"]);
 
-            const xScale = d3.scaleLinear().domain(xExtent).range([0, sChartWidth]);
-            // switching min and max to account for SVG coordinates
-            const yScale = d3
-                    .scaleLinear()
-                    .domain(yExtent)
-                    .range([sChartHeight, 0]);
-            
-            // part C
-            // left axis
-            let sLeftAxis = d3.axisLeft(yScale);
-            scatter.append("g")
-                    .attr("id", "scatterYAxis")
-                    .attr("transform", `translate(${sMargin.left - 10},${sMargin.top})`)
+          const xScale = d3
+            .scaleLinear()
+            .domain(xExtent)
+            .range([0, sChartWidth]);
+          // switching min and max to account for SVG coordinates
+          const yScale = d3
+            .scaleLinear()
+            .domain(yExtent)
+            .range([sChartHeight, 0]);
 
-            // left gridlines
-            let sLeftGridlines = d3
-                        .axisLeft(yScale)
-                        .tickSize(-sChartWidth - 10)
-                        .tickFormat("");
-            scatter.append("g")
-                    .attr("class", "y gridlines")
-                    .attr("id", "scatterYGrid")
-                    .attr("transform", `translate(${sMargin.left - 10},${sMargin.top})`)
+          const rScale = d3.scaleLinear().domain(rExtent).range([4, 10]);
 
-            // bottom axis
-            let sBottomAxis = d3.axisBottom(xScale);
-            scatter.append("g")
-                    .attr("class", "x axis")
-                    .attr("id", "scatterXAxis")
-                    .attr(
-                        "transform",
-                        `translate(${sMargin.left},${sChartHeight + sMargin.top + 10})`
-                    )
+          // part C
+          // left axis
+          let sLeftAxis = d3.axisLeft(yScale);
+          scatter
+            .append("g")
+            .attr("id", "scatterYAxis")
+            .attr(
+              "transform",
+              `translate(${sMargin.left - 10},${sMargin.top})`
+            );
 
-            // bottom gridlines
-            let sBottomGridlines = d3
-                                .axisBottom(xScale)
-                                .tickSize(-sChartHeight - 10)
-                                .tickFormat("");
-            scatter.append("g")
-                .attr("class", "x gridlines")
-                .attr("id", "scatterXGrid")
-                .attr(
-                    "transform",
-                    `translate(${sMargin.left},${sChartHeight + sMargin.top + 10})`
-                )
+          // left gridlines
+          let sLeftGridlines = d3
+            .axisLeft(yScale)
+            .tickSize(-sChartWidth - 10)
+            .tickFormat("");
+          scatter
+            .append("g")
+            .attr("class", "y gridlines")
+            .attr("id", "scatterYGrid")
+            .attr(
+              "transform",
+              `translate(${sMargin.left - 10},${sMargin.top})`
+            );
 
-            scatter.select("#scatterXAxis").transition().duration(500).call(sBottomAxis);
-            scatter.select("#scatterXGrid").transition().duration(500).call(sBottomGridlines);
-            scatter.select("#scatterYAxis").transition().duration(500).call(sLeftAxis);
-            scatter.select("#scatterYGrid").transition().duration(500).call(sLeftGridlines);
+          // bottom axis
+          let sBottomAxis = d3.axisBottom(xScale);
+          scatter
+            .append("g")
+            .attr("class", "x axis")
+            .attr("id", "scatterXAxis")
+            .attr(
+              "transform",
+              `translate(${sMargin.left},${sChartHeight + sMargin.top + 10})`
+            );
 
+          // bottom gridlines
+          let sBottomGridlines = d3
+            .axisBottom(xScale)
+            .tickSize(-sChartHeight - 10)
+            .tickFormat("");
+          scatter
+            .append("g")
+            .attr("class", "x gridlines")
+            .attr("id", "scatterXGrid")
+            .attr(
+              "transform",
+              `translate(${sMargin.left},${sChartHeight + sMargin.top + 10})`
+            );
+
+          scatter
+            .select("#scatterXAxis")
+            .transition()
+            .duration(500)
+            .call(sBottomAxis);
+          scatter
+            .select("#scatterXGrid")
+            .transition()
+            .duration(500)
+            .call(sBottomGridlines);
+          scatter
+            .select("#scatterYAxis")
+            .transition()
+            .duration(500)
+            .call(sLeftAxis);
+          scatter
+            .select("#scatterYGrid")
+            .transition()
+            .duration(500)
+            .call(sLeftGridlines);
+
+          // just adjust points
+          if (firstLoad == false) {
+            console.log("second load");
+            scatter
+              .selectAll(".point")
+              .transition()
+              .duration(500)
+              .attr("cx", (d) => xScale(d[xVariable]))
+              .attr("cy", (d) => yScale(d[yVariable]));
+          } else {
+            console.log("first load");
             scatterArea
-                    .selectAll("circle")
-                    .data(total)
-                    .join( (enter) => 
-                        enter.append("circle")
-                        .attr("class", "point")
-                        .attr("cx", (d) => xScale(d[xVariable]))
-                        .attr("cy", (d) => yScale(d[yVariable]))
-                        .attr("r", 5))
-                        .attr("fill", (d) => {
-                            if (d['ivy'] === "True") {
-                                return "gold"
-                            }
-                            else {
-                                return "blue"
-                            }})
-                    .transition()
-                    .duration(500);
+              .selectAll("circle")
+              .data(total)
+              .join((enter) =>
+                enter
+                  .append("circle")
+                  .attr("class", "point")
+                  .attr("cx", (d) => xScale(d[xVariable]))
+                  .attr("cy", (d) => yScale(d[yVariable]))
+                  .attr("r", (d) => rScale(d["UGDS"]))
+              )
+              .attr("fill", (d) => {
+                if (d["ivy"] === "True") {
+                  return "gold";
+                } else {
+                  return "blue";
+                }
+              });
+            firstLoad = false;
+          }
         }
 
         // eventually make the code below into a function we can just repeat for the 4 histograms
 
         function makeHistogram(svg, attribute, xlabel) {
-            const histo = d3.select(svg);
-            const width = histo.attr("width");
-            const height = histo.attr("height");
-            const histoMargin = { top: 10, right: 20, bottom: 60, left: 30 };
-            const histoWidth = width - histoMargin.right - histoMargin.left;
-            const histoHeight = height - histoMargin.top - histoMargin.bottom;
+          const histo = d3.select(svg);
+          const width = histo.attr("width");
+          const height = histo.attr("height");
+          const histoMargin = { top: 10, right: 20, bottom: 60, left: 30 };
+          const histoWidth = width - histoMargin.right - histoMargin.left;
+          const histoHeight = height - histoMargin.top - histoMargin.bottom;
 
-            let annotations = histo.append("g").attr("id", "annotations");
-            let histoArea = histo.append("g").attr("id", "bars")
-                                            .attr(
-                                            "transform",
-                                            "translate(" + (histoMargin.left) + "," + histoMargin.top + ")"
-                                            );
+          let annotations = histo.append("g").attr("id", "annotations");
+          let histoArea = histo
+            .append("g")
+            .attr("id", "bars")
+            .attr(
+              "transform",
+              "translate(" + histoMargin.left + "," + histoMargin.top + ")"
+            );
 
-            // histograms
-            let rest_values = rest.map((d) => d[attribute]);
-            let rest_minMax = d3.extent(rest_values);
-            let ivy_values = ivies.map((d) => d[attribute]);
+          // histograms
+          let rest_values = rest.map((d) => d[attribute]);
+          let rest_minMax = d3.extent(rest_values);
+          let ivy_values = ivies.map((d) => d[attribute]);
 
-            let xScale = d3.scaleLinear().domain(rest_minMax).range([0, histoWidth]);
-            let bottomAxis = d3.axisBottom(xScale);
+          let xScale = d3
+            .scaleLinear()
+            .domain(rest_minMax)
+            .range([0, histoWidth]);
+          let bottomAxis = d3.axisBottom(xScale);
 
-            let numBins = 10;
-            let histoGen = d3.histogram().domain(rest_minMax).thresholds(numBins);
+          let numBins = 10;
+          let histoGen = d3.histogram().domain(rest_minMax).thresholds(numBins);
 
-            let rest_bins = histoGen(rest_values);
-            console.log("rest histo", rest_bins)
-            let ivy_bins = histoGen(ivy_values);
-            console.log("ivy histo", ivy_bins);
+          let rest_bins = histoGen(rest_values);
+          console.log("rest histo", rest_bins);
+          let ivy_bins = histoGen(ivy_values);
+          console.log("ivy histo", ivy_bins);
 
-            // y axis 
-            let yScale = d3.scaleLinear().domain(d3.extent(rest_bins, (d) => d.length))
-                                                    .range([histoHeight, 0]);
+          // y axis
+          let yScale = d3
+            .scaleLinear()
+            .domain(d3.extent(rest_bins, (d) => d.length))
+            .range([histoHeight, 0]);
 
-            let leftAxis = d3.axisLeft(yScale);
-            let leftGridlines = d3.axisLeft(yScale).tickSize(-histoWidth - 10).tickFormat("");
+          let leftAxis = d3.axisLeft(yScale);
+          let leftGridlines = d3
+            .axisLeft(yScale)
+            .tickSize(-histoWidth - 10)
+            .tickFormat("");
 
-            annotations.append("g").attr("class", "y axis")
-                                .attr("transform","translate(" +(histoMargin.left - 10) +"," +histoMargin.top +")")
-                                .call(leftAxis);
-            
-            annotations.append("g").attr("class", "y gridlines")
-                            .attr("transform","translate(" +(histoMargin.left - 10) +"," +histoMargin.top +")")
-                            .call(leftGridlines);
-            
-            annotations.append("g").attr("class", "x axis")
-                            .attr("transform","translate(" +(histoMargin.left) +"," +(histoHeight + histoMargin.top) +")")
-                            .call(bottomAxis)
-                            .selectAll("text") 
-                            .style("text-anchor", "end")
-                            .attr("transform", "translate(-10, 2) rotate(-65)");
+          annotations
+            .append("g")
+            .attr("class", "y axis")
+            .attr(
+              "transform",
+              "translate(" +
+                (histoMargin.left - 10) +
+                "," +
+                histoMargin.top +
+                ")"
+            )
+            .call(leftAxis);
 
-            let rest_rectangles = histoArea.selectAll("rect.rest").data(rest_bins)
-                    .join("rect")
-                    .attr("class", "rest")
-                    .attr("x", (d) => xScale(d.x0))
-                    .attr("y", (d) => yScale(d.length))
-                    .attr("width", function (d) {
-                        return xScale(d.x1) - xScale(d.x0);
-                    })
-                    .attr("height", function (d) {
-                        return histoHeight - yScale(d.length);
-                    })
-                    .style("fill", "blue")
-                    .style("stroke", "black")
-                    .style("stroke-width", 1)
-                    .style("opacity", 0.9);
+          annotations
+            .append("g")
+            .attr("class", "y gridlines")
+            .attr(
+              "transform",
+              "translate(" +
+                (histoMargin.left - 10) +
+                "," +
+                histoMargin.top +
+                ")"
+            )
+            .call(leftGridlines);
 
-            let ivy_rectangles = histoArea.selectAll("rect.ivy").data(ivy_bins)
-                    .join("rect")
-                    .attr("class", "ivy")
-                    .attr("x", (d) => xScale(d.x0))
-                    .attr("y", (d) => yScale(d.length))
-                    .attr("width", function (d) {
-                        return xScale(d.x1) - xScale(d.x0);
-                    })
-                    .attr("height", function (d) {
-                        return histoHeight - yScale(d.length);
-                    })
-                    .style("fill", "gold")
-                    .style("stroke", "black")
-                    .style("stroke-width", 1)
-                    .style("opacity", 0.9);
+          annotations
+            .append("g")
+            .attr("class", "x axis")
+            .attr(
+              "transform",
+              "translate(" +
+                histoMargin.left +
+                "," +
+                (histoHeight + histoMargin.top) +
+                ")"
+            )
+            .call(bottomAxis)
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("transform", "translate(-10, 2) rotate(-65)");
 
-            annotations.append("text")
-                .attr("class", "x label")
-                .attr("text-anchor", "middle")
-                .attr("x", (histoWidth / 2) + histoMargin.left)
-                .attr("y", histoHeight + histoMargin.bottom)
-                .text(xlabel);
-            
+          let rest_rectangles = histoArea
+            .selectAll("rect.rest")
+            .data(rest_bins)
+            .join("rect")
+            .attr("class", "rest")
+            .attr("x", (d) => xScale(d.x0))
+            .attr("y", (d) => yScale(d.length))
+            .attr("width", function (d) {
+              return xScale(d.x1) - xScale(d.x0);
+            })
+            .attr("height", function (d) {
+              return histoHeight - yScale(d.length);
+            })
+            .style("fill", "blue")
+            .style("stroke", "black")
+            .style("stroke-width", 1)
+            .style("opacity", 0.9);
+
+          let ivy_rectangles = histoArea
+            .selectAll("rect.ivy")
+            .data(ivy_bins)
+            .join("rect")
+            .attr("class", "ivy")
+            .attr("x", (d) => xScale(d.x0))
+            .attr("y", (d) => yScale(d.length))
+            .attr("width", function (d) {
+              return xScale(d.x1) - xScale(d.x0);
+            })
+            .attr("height", function (d) {
+              return histoHeight - yScale(d.length);
+            })
+            .style("fill", "gold")
+            .style("stroke", "black")
+            .style("stroke-width", 1)
+            .style("opacity", 0.9);
+
+          annotations
+            .append("text")
+            .attr("class", "x label")
+            .attr("text-anchor", "middle")
+            .attr("x", histoWidth / 2 + histoMargin.left)
+            .attr("y", histoHeight + histoMargin.bottom)
+            .text(xlabel);
         }
 
         makeHistogram("#tuition", "COSTT4_A", "Average Annual Cost");
         makeHistogram("#debt", "GRAD_DEBT_MDN", "Median Debt");
         makeHistogram("#earnings", "MD_EARN_WNE_P10", "Median Earnings");
         makeHistogram("#admission", "ADM_RATE", "Admission Rate");
-        makeScatter(3,0);
+        makeScatter(3, 0);
 
-
-        // update the axis for the scatter plot 
+        // update the axis for the scatter plot
         let xLabel = document.getElementById("xButton");
         let yLabel = document.getElementById("yButton");
         let xArrowLeft = document.getElementById("xArrowLeft");
@@ -338,45 +428,44 @@
 
         // Add click event listeners to the arrows
         xArrowLeft.addEventListener("click", function () {
-            console.log("xArrowLeft");
-            xLabelIndex = (xLabelIndex - 1) % 4;
-            if (xLabelIndex < 0) {
+          console.log("xArrowLeft");
+          xLabelIndex = (xLabelIndex - 1) % 4;
+          if (xLabelIndex < 0) {
             xLabelIndex = 3;
-            }
-            xLabel.textContent = buttonLabels[xLabelIndex];
-            makeScatter(xLabelIndex, yLabelIndex);
+          }
+          xLabel.textContent = buttonLabels[xLabelIndex];
+          makeScatter(xLabelIndex, yLabelIndex);
         });
         xArrowRight.addEventListener("click", function () {
-            if (xLabelIndex < 3) {
+          if (xLabelIndex < 3) {
             xLabelIndex = (xLabelIndex + 1) % 4;
-            } else {
+          } else {
             xLabelIndex = 0;
-            }
-            xLabel.textContent = buttonLabels[xLabelIndex];
-            makeScatter(xLabelIndex, yLabelIndex);
+          }
+          xLabel.textContent = buttonLabels[xLabelIndex];
+          makeScatter(xLabelIndex, yLabelIndex);
         });
 
         yArrowLeft.addEventListener("click", function () {
-            yLabelIndex = (yLabelIndex - 1) % 4;
-            if (yLabelIndex < 0) {
+          yLabelIndex = (yLabelIndex - 1) % 4;
+          if (yLabelIndex < 0) {
             yLabelIndex = 3;
-            }
-            yLabel.textContent = buttonLabels[yLabelIndex];
-            makeScatter(xLabelIndex, yLabelIndex);
+          }
+          yLabel.textContent = buttonLabels[yLabelIndex];
+          makeScatter(xLabelIndex, yLabelIndex);
         });
         yArrowRight.addEventListener("click", function () {
-            if (yLabelIndex < 3) {
+          if (yLabelIndex < 3) {
             yLabelIndex = (yLabelIndex + 1) % 4;
-            } else {
+          } else {
             yLabelIndex = 0;
-            }
-            yLabel.textContent = buttonLabels[yLabelIndex];
-            makeScatter(xLabelIndex, yLabelIndex);
+          }
+          yLabel.textContent = buttonLabels[yLabelIndex];
+          makeScatter(xLabelIndex, yLabelIndex);
         });
+      };
 
-    };
-
-    createGraph();
+      createGraph();
     </script>
-</body>
+  </body>
 </html>
