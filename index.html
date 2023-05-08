@@ -53,6 +53,9 @@
         display: flex;
       }
 
+      .col-2 {
+        display: flex;
+      }
       .col-3 {
         display: flex;
         align-items: flex-end;
@@ -68,6 +71,49 @@
       }
       .histo-text {
         width: 50%;
+      }
+      /* #scatter.div {
+        background-color: red;
+        height: 100px;
+        width: 100px;
+      } */
+      #inspector {
+        height: 370px;
+        width: 400px;
+        background-color: rgba(0, 0, 255, 0.231);
+        display: flex;
+        justify-content: flex-start;
+        flex-direction: column;
+      }
+      #inspector-header {
+        text-align: center;
+        border-bottom: 1px solid grey;
+      }
+      #details {
+        margin-left: 20px;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 8px;
+      }
+
+      th {
+        background-color: #f2f2f2;
+      }
+
+      tr.alt {
+        background-color: rgba(0, 0, 255, 0.231);
+      }
+
+      #detail-table {
+        visibility: hidden;
       }
     </style>
   </head>
@@ -97,6 +143,33 @@
 
       <div class="col col-2">
         <svg id="scatter" width="800" height="800"></svg>
+        <div id="inspector">
+          <div id="inspector-header">
+            <h2 id="name">&nbsp;</h2>
+          </div>
+          <div id="details">
+            <table id="detail-table">
+              <tbody>
+                <tr>
+                  <td>Cost</td>
+                  <td id="costText">&nbsp;</td>
+                </tr>
+                <tr class="alt">
+                  <td>Admission Rate</td>
+                  <td id="adText">&nbsp;</td>
+                </tr>
+                <tr>
+                  <td>Debt</td>
+                  <td id="debtText">&nbsp;</td>
+                </tr>
+                <tr class="alt">
+                  <td>Median Income</td>
+                  <td id="inText">&nbsp;</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       <div class="col col-3">
@@ -247,7 +320,9 @@
               .duration(500)
               .attr("cx", (d) => xScale(d[xVariable]))
               .attr("cy", (d) => yScale(d[yVariable]));
-          } else {
+          }
+          // create initial points on first load
+          else {
             console.log("first load");
             scatterArea
               .selectAll("circle")
@@ -256,6 +331,12 @@
                 enter
                   .append("circle")
                   .attr("class", "point")
+                  .attr("name", (d) => d["INSTNM"])
+                  .attr("cost", (d) => d["COSTT4_A"])
+                  .attr("ad", (d) => d["ADM_RATE"])
+                  .attr("debt", (d) => d["GRAD_DEBT_MDN"])
+                  .attr("in", (d) => d["MD_EARN_WNE_P10"])
+                  .attr("y", (d) => yScale(d[yVariable]))
                   .attr("cx", (d) => xScale(d[xVariable]))
                   .attr("cy", (d) => yScale(d[yVariable]))
                   .attr("r", (d) => rScale(d["UGDS"]))
@@ -266,7 +347,38 @@
                 } else {
                   return "blue";
                 }
+              })
+              .on("mouseover", function (d) {
+                console.log("moused over");
+                // Get the name of the circle
+                var c = d3.select(this);
+                var name = c.attr("name");
+                var cost = c.attr("cost");
+                var ad = c.attr("ad");
+                var debt = c.attr("debt");
+                var inc = c.attr("in");
+                var r = c.attr("r");
+
+                console.log(c, name, cost);
+
+                document.getElementById("name").innerText = name;
+                document.getElementById("costText").innerText = cost;
+                document.getElementById("adText").innerText = ad;
+                document.getElementById("debtText").innerText = debt;
+                document.getElementById("inText").innerText = inc;
+
+                document.getElementById("detail-table").style.visibility =
+                  "visible";
+
+                c.attr("r", r * 1.4);
+              })
+              .on("mouseout", function (d) {
+                scatter.select("#annotations").selectAll("*").remove();
+                var c = d3.select(this);
+                var r = c.attr("r");
+                c.attr("r", r / 1.4);
               });
+
             firstLoad = false;
           }
         }
@@ -304,11 +416,11 @@
           let numBins = 10;
           let histoGen = d3.histogram().domain(rest_minMax).thresholds(numBins);
 
-            // the smaller rectangles are from the fact that it's not even distribution in the bins right?
-            let rest_bins = histoGen(rest_values);
-            console.log("rest histo", rest_bins)
-            let ivy_bins = histoGen(ivy_values);
-            console.log("ivy histo", ivy_bins);
+          // the smaller rectangles are from the fact that it's not even distribution in the bins right?
+          let rest_bins = histoGen(rest_values);
+          console.log("rest histo", rest_bins);
+          let ivy_bins = histoGen(ivy_values);
+          console.log("ivy histo", ivy_bins);
 
           // y axis
           let yScale = d3
@@ -364,65 +476,67 @@
             .style("text-anchor", "end")
             .attr("transform", "translate(-10, 2) rotate(-65)");
 
-            let rest_rectangles = histoArea.selectAll("rect.rest").data(rest_bins)
-                    .join("rect")
-                    .attr("class", "rest")
-                    .attr("x", (d) => xScale(d.x0))
-                    .attr("y", (d) => yScale(d.length))
-                    .attr("width", function (d) {
-                        return xScale(d.x1) - xScale(d.x0);
-                    })
-                    .attr("height", function (d) {
-                        return histoHeight - yScale(d.length);
-                    })
-                    .style("fill", "blue")
-                    .style("stroke", "black")
-                    .style("stroke-width", 1)
-                    .style("opacity", 1.0)
-                    .on("mouseover", mouseOverRect)
-                    .on("mouseout", mouseOutRect);
+          let rest_rectangles = histoArea
+            .selectAll("rect.rest")
+            .data(rest_bins)
+            .join("rect")
+            .attr("class", "rest")
+            .attr("x", (d) => xScale(d.x0))
+            .attr("y", (d) => yScale(d.length))
+            .attr("width", function (d) {
+              return xScale(d.x1) - xScale(d.x0);
+            })
+            .attr("height", function (d) {
+              return histoHeight - yScale(d.length);
+            })
+            .style("fill", "blue")
+            .style("stroke", "black")
+            .style("stroke-width", 1)
+            .style("opacity", 1.0)
+            .on("mouseover", mouseOverRect)
+            .on("mouseout", mouseOutRect);
 
-            let ivy_rectangles = histoArea.selectAll("rect.ivy").data(ivy_bins)
-                    .join("rect")
-                    .attr("class", "ivy")
-                    .attr("x", (d) => xScale(d.x0))
-                    .attr("y", (d) => yScale(d.length))
-                    .attr("width", function (d) {
-                        return xScale(d.x1) - xScale(d.x0);
-                    })
-                    .attr("height", function (d) {
-                        return histoHeight - yScale(d.length);
-                    })
-                    .style("fill", "gold")
-                    .style("stroke", "black")
-                    .style("stroke-width", 1)
-                    .style("opacity", 1.0)
-                    .on("mouseover", mouseOverRect)
-                    .on("mouseout", mouseOutRect);
+          let ivy_rectangles = histoArea
+            .selectAll("rect.ivy")
+            .data(ivy_bins)
+            .join("rect")
+            .attr("class", "ivy")
+            .attr("x", (d) => xScale(d.x0))
+            .attr("y", (d) => yScale(d.length))
+            .attr("width", function (d) {
+              return xScale(d.x1) - xScale(d.x0);
+            })
+            .attr("height", function (d) {
+              return histoHeight - yScale(d.length);
+            })
+            .style("fill", "gold")
+            .style("stroke", "black")
+            .style("stroke-width", 1)
+            .style("opacity", 1.0)
+            .on("mouseover", mouseOverRect)
+            .on("mouseout", mouseOutRect);
 
-            annotations.append("text")
-                .attr("class", "x label")
-                .attr("text-anchor", "middle")
-                .attr("x", (histoWidth / 2) + histoMargin.left)
-                .attr("y", histoHeight + histoMargin.bottom)
-                .text(xlabel);    
+          annotations
+            .append("text")
+            .attr("class", "x label")
+            .attr("text-anchor", "middle")
+            .attr("x", histoWidth / 2 + histoMargin.left)
+            .attr("y", histoHeight + histoMargin.bottom)
+            .text(xlabel);
         }
 
         // QUESTION - is there a way to recover the data points that fall into each point? Like if we want to show list of colleges
-        function mouseOverRect(event, d){
-            let obj = d3.select(this);
-            let number = d.length;
-            obj.style("stroke-width", 3);
+        function mouseOverRect(event, d) {
+          let obj = d3.select(this);
+          let number = d.length;
+          obj.style("stroke-width", 3);
 
-            // how would I show the number of schools and which ones?
-
-
+          // how would I show the number of schools and which ones?
         }
-        function mouseOutRect(event, d){
-            let obj = d3.select(this);
-            obj.style("stroke-width", 1);
-
-        };
+        function mouseOutRect(event, d) {
+          let obj = d3.select(this);
+          obj.style("stroke-width", 1);
+        }
 
         makeHistogram("#tuition", "COSTT4_A", "Average Annual Cost");
         makeHistogram("#debt", "GRAD_DEBT_MDN", "Median Debt");
