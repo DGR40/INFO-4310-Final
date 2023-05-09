@@ -39,6 +39,17 @@
         background-color: #ccc;
       }
 
+      .reset {
+        width: 200px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        text-align: center;
+        vertical-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
       .arrow:hover {
         opacity: 0.4;
       }
@@ -127,6 +138,7 @@
       }
       #details2 {
         margin-left: 20px;
+        margin-right: 20px;
       }
 
       table {
@@ -160,6 +172,12 @@
       }
       h1 {
         color: black;
+      }
+      .green {
+        color: green;
+      }
+      .red {
+        color: red;
       }
     </style>
   </head>
@@ -219,6 +237,10 @@
               </table>
             </div>
           </div>
+
+          <h2 style="margin-left: 20px" id="instruct">
+            Click a college to begin comparison...
+          </h2>
 
           <div id="inspector2">
             <div id="inspector-header">
@@ -283,10 +305,36 @@
         var val1 = document.getElementById(type).innerText;
         var val2 = document.getElementById(`${type}2`).innerText;
 
-        var percentChangeVal1 = val2 - val2 / val1;
-        var percentChangeVal2 = val1 - val2 / val2;
+        console.log("values: ", val1, val2);
+
+        var percentChangeVal1 = val2 - val1;
+        var percentChangeVal2 = val1 - val2;
+
+        if (type == "adTest") {
+          percentChangeVal1 = val2 - val1;
+          percentChangeVal2 = val1 - val2;
+        }
+
+        console.log(percentChangeVal1);
 
         return [percentChangeVal1, percentChangeVal2];
+      }
+
+      function getHTML(value) {
+        if (value < 0) {
+          return `<span class="red"> (${d3.format(",f")(value)})</span>`;
+        } else {
+          return `<span class="green"> (+${d3.format(",f")(value)})</span>`;
+        }
+      }
+
+      function addCompareValues(inspector, cost, ad, debt, inc) {
+        document.getElementById(`costText${inspector}`).innerHTML +=
+          getHTML(cost);
+        document.getElementById(`adText${inspector}`).innerHTML += getHTML(ad);
+        document.getElementById(`debtText${inspector}`).innerHTML +=
+          getHTML(debt);
+        document.getElementById(`inText${inspector}`).innerHTML += getHTML(inc);
       }
 
       const createGraph = async function () {
@@ -468,6 +516,8 @@
 
                   document.getElementById("detail-table").style.visibility =
                     "visible";
+
+                  document.getElementById("instruct").style.display = "none";
                 }
 
                 // update second inspector
@@ -504,7 +554,26 @@
                     "block";
                 }
                 if (numSelected == 2) {
-                  var compVals = compareValues("costText");
+                  var costVals = compareValues("costText");
+                  var incVals = compareValues("inText");
+                  var adVals = compareValues("adText");
+                  var debtVals = compareValues("debtText");
+
+                  addCompareValues(
+                    "2",
+                    costVals[0],
+                    adVals[0],
+                    incVals[0],
+                    debtVals[0]
+                  );
+
+                  addCompareValues(
+                    "",
+                    costVals[1],
+                    adVals[1],
+                    incVals[1],
+                    debtVals[1]
+                  );
                 }
                 c.attr("stroke", "black");
               });
