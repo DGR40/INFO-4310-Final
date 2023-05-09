@@ -11,7 +11,7 @@
     />
     <style>
       body {
-        font-family: "Noto Sans Georgian", sans-serif;
+        font-family: "Georgia", sans-serif;
       }
       .histo {
         background-color: #bbb;
@@ -163,15 +163,25 @@
       #detail-table {
         visibility: hidden;
       }
-      header {
+
+      header{
         height: 100vh;
         display: flex;
         flex-direction: column;
         justify-content: center;
         background-image: url("ivy_resized.png");
+        margin-bottom: 20px;
       }
-      h1 {
+      .header-text {
         color: black;
+        background-color: white;
+        text-align: center;
+      }
+      h3{
+        font-weight: normal;
+      }
+      h1{
+        font-weight: bold;
       }
       .green {
         color: green;
@@ -184,7 +194,10 @@
 
   <body>
     <header>
-      <h1>A Study of the Top Universities in the United States</h1>
+        <div class="header-text">
+            <h1> A Study of the Top Universities in the United States </h1>
+            <h3> Are the prestigious Ivy League schools worth your while? Let's find out.  </h3>
+        </div> 
     </header>
     <div class="histo-section">
       <div class="histo-text">
