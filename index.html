@@ -95,12 +95,15 @@
         width: 100px;
       } */
       #inspector {
+        border-radius: 10px;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
         height: 370px;
         width: 400px;
-        background-color: rgba(0, 0, 255, 0.231);
+        background-color: #fff2ce;
         display: flex;
         justify-content: flex-start;
         flex-direction: column;
+        color: #002947;
       }
       #inspector-header {
         text-align: center;
@@ -110,13 +113,15 @@
       #details {
         margin-left: 20px;
         margin-right: 20px;
+        color: #002947;
       }
 
       #inspector2 {
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
         margin-top: 30px;
         height: 370px;
         width: 400px;
-        background-color: rgba(0, 0, 255, 0.231);
+        background-color: #6bbcd1;
         display: flex;
         justify-content: flex-start;
         flex-direction: column;
@@ -157,14 +162,18 @@
       }
 
       tr.alt {
-        background-color: rgba(0, 0, 255, 0.231);
+        background-color: #fce39f;
+      }
+
+      tr.alt2 {
+        background-color: #3eb4d1;
       }
 
       #detail-table {
         visibility: hidden;
       }
 
-      header{
+      header {
         height: 100vh;
         display: flex;
         flex-direction: column;
@@ -177,10 +186,10 @@
         background-color: white;
         text-align: center;
       }
-      h3{
+      h3 {
         font-weight: normal;
       }
-      h1{
+      h1 {
         font-weight: bold;
       }
       .green {
@@ -194,10 +203,13 @@
 
   <body>
     <header>
-        <div class="header-text">
-            <h1> A Study of the Top Universities in the United States </h1>
-            <h3> Are the prestigious Ivy League schools worth your while? Let's find out.  </h3>
-        </div> 
+      <div class="header-text">
+        <h1>A Study of the Top Universities in the United States</h1>
+        <h3>
+          Are the prestigious Ivy League schools worth your while? Let's find
+          out.
+        </h3>
+      </div>
     </header>
     <div class="histo-section">
       <div class="histo-text">
@@ -266,7 +278,7 @@
                     <td>Cost</td>
                     <td id="costText2">&nbsp;</td>
                   </tr>
-                  <tr class="alt">
+                  <tr class="alt2">
                     <td>Admission Rate</td>
                     <td id="adText2">&nbsp;</td>
                   </tr>
@@ -274,7 +286,7 @@
                     <td>Debt</td>
                     <td id="debtText2">&nbsp;</td>
                   </tr>
-                  <tr class="alt">
+                  <tr class="alt2">
                     <td>Median Income</td>
                     <td id="inText2">&nbsp;</td>
                   </tr>
@@ -284,7 +296,7 @@
           </div>
 
           <div id="inspector2-outline">
-            <h2>Hover over another college to compare...</h2>
+            <h2>Hover the click then click on another college to compare...</h2>
           </div>
         </div>
       </div>
@@ -499,9 +511,9 @@
               )
               .attr("fill", (d) => {
                 if (d["ivy"] === "True") {
-                  return "gold";
+                  return "#FD9415";
                 } else {
-                  return "blue";
+                  return "#6bbcd1";
                 }
               })
               .on("mouseover", function (d) {
@@ -529,8 +541,6 @@
 
                   document.getElementById("detail-table").style.visibility =
                     "visible";
-
-                  document.getElementById("instruct").style.display = "none";
                 }
 
                 // update second inspector
@@ -549,13 +559,17 @@
                     "visible";
                   document.getElementById("inspector2").style.display = "flex";
                 }
-                c.attr("r", r * 1.4);
+                c.attr("r", r * 1.7);
+                c.style("stroke", "black");
               })
               .on("mouseout", function (d) {
                 var c = d3.select(this);
-                if (c.style("stroke") !== "black") {
-                  var r = c.attr("r");
-                  c.attr("r", r / 1.4);
+                var r = c.attr("r");
+                if (c.style("stroke") === "black" && c.attr("r") != "12") {
+                  c.attr("r", r / 1.7);
+                  c.style("stroke", "");
+                } else {
+                  c.attr("r", r / 1.7);
                 }
               })
               .on("click", function (d) {
@@ -563,14 +577,19 @@
                 var c = d3.select(this);
                 // set circle to selected
                 if (numSelected == 1) {
+                  document.getElementById("instruct").style.display = "none";
                   document.getElementById("inspector2-outline").style.display =
                     "block";
+                  c.style("stroke", "black");
+                  c.attr("r", 12).transitiom().duration(500);
                 }
                 if (numSelected == 2) {
                   var costVals = compareValues("costText");
                   var incVals = compareValues("inText");
                   var adVals = compareValues("adText");
                   var debtVals = compareValues("debtText");
+                  c.style("stroke", "black");
+                  c.attr("r", 12).transitiom().duration(500);
 
                   addCompareValues(
                     "2",
@@ -588,7 +607,6 @@
                     debtVals[1]
                   );
                 }
-                c.attr("stroke", "black");
               });
             firstLoad = false;
           }
