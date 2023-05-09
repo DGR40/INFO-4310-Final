@@ -68,15 +68,9 @@
 
       .scatter-container {
         display: flex;
+        flex-direction: row;
       }
 
-      .col-2 {
-        display: flex;
-      }
-      .col-3 {
-        display: flex;
-        align-items: flex-end;
-      }
       .histo-section {
         display: flex;
         flex-direction: row;
@@ -89,6 +83,11 @@
       .histo-text {
         width: 50%;
       }
+
+      #yButtonContainer {
+        transform: translateY(-50%);
+      }
+
       /* #scatter.div {
         background-color: red;
         height: 100px;
@@ -97,13 +96,14 @@
       #inspector {
         border-radius: 10px;
         box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-        height: 370px;
-        width: 400px;
-        background-color: #fff2ce;
+        height: 320px;
+        width: 370px;
+        background-color: #dcdcdc;
         display: flex;
         justify-content: flex-start;
         flex-direction: column;
         color: #002947;
+        display: none;
       }
       #inspector-header {
         text-align: center;
@@ -117,38 +117,73 @@
       }
 
       #inspector2 {
+        border-radius: 10px;
         box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
         margin-top: 30px;
-        height: 370px;
-        width: 400px;
-        background-color: #6bbcd1;
+        height: 320px;
+        width: 370px;
+        background-color: #002947;
         display: flex;
         justify-content: flex-start;
         flex-direction: column;
+        color: white;
         display: none;
+      }
+      #inspector-outline {
+        margin-top: 30px;
+        height: 320px;
+        width: 370px;
+        border: 2px dashed grey;
+        border-radius: 10px;
+        text-align: center;
+        vertical-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       #inspector2-outline {
         margin-top: 30px;
-        height: 370px;
-        width: 400px;
+        height: 320px;
+        width: 370px;
         border: 2px dashed grey;
-        display: none;
+        border-radius: 10px;
         text-align: center;
+        vertical-align: center;
+        display: none;
+        align-items: center;
+        justify-content: center;
       }
 
       #inspector-header2 {
         text-align: center;
         border-bottom: 1px solid grey;
       }
-      #details2 {
+      #detail-table2 {
         margin-left: 20px;
         margin-right: 20px;
+        color: white;
+      }
+
+      #compareText {
+        display: none;
+      }
+
+      .comparer {
+        border: 1px solid grey;
+        border-radius:10px;
+        padding:10px;
+        margin-left:10px;
+      }
+
+      .comparer > h1 {
+        text-align: center;
       }
 
       table {
         border-collapse: collapse;
         width: 100%;
+        color: #002947;
       }
 
       th,
@@ -161,12 +196,8 @@
         background-color: #f2f2f2;
       }
 
-      tr.alt {
-        background-color: #fce39f;
-      }
-
-      tr.alt2 {
-        background-color: #3eb4d1;
+      tr {
+        border-bottom: 1px solid #aaaaaa;
       }
 
       #detail-table {
@@ -198,6 +229,16 @@
       .red {
         color: red;
       }
+
+      .left {
+        width:900px;
+        background-color:rgb(239, 239, 239);
+        border-radius:10px;
+      }
+
+      .right {
+        width:300px;
+      }
     </style>
   </head>
 
@@ -224,20 +265,33 @@
     </div>
 
     <div class="scatter-container">
-      <div class="col-1 col">
-        <div class="yButtonContainer">
-          <span class="arrow arrow-left" id="yArrowLeft"></span>
-          <button class="button" id="yButton">Cost</button>
-          <span class="arrow" id="yArrowRight"></span>
+      <div class="left">
+        <div id="yButtonContainer">
+        <span class="arrow arrow-left" id="yArrowLeft"></span>
+        <button class="button" id="yButton">Cost</button>
+        <span class="arrow" id="yArrowRight"></span>
+      </div>
+        <svg id="scatter" width="800" height="800"></svg>
+        <div class="col col-3">
+          <div class="xButtonContainer">
+            <span class="arrow arrow-left" id="xArrowLeft"></span>
+            <button id="xButton" class="button">Admission Rate</button>
+            <span class="arrow" id="xArrowRight"></span>
+          </div>
         </div>
       </div>
-
-      <div class="col col-2">
-        <svg id="scatter" width="800" height="800"></svg>
-        <div>
+      
+        <div class="comparer">
+          <h1>College Comparer</h1>
+          <div id="inspector-outline">
+            <h2>
+              Hover to gleam details... <br />
+              Click on circle to compare...
+            </h2>
+          </div>
           <div id="inspector">
             <div id="inspector-header">
-              <h2 id="name">Hover over a college to view details...</h2>
+              <h2 id="name">&nbsp;</h2>
             </div>
             <div id="details">
               <table id="detail-table">
@@ -263,9 +317,7 @@
             </div>
           </div>
 
-          <h2 style="margin-left: 20px" id="instruct">
-            Click a college to begin comparison...
-          </h2>
+          <div id="compareText"><h2>Click to compare...</h2></div>
 
           <div id="inspector2">
             <div id="inspector-header">
@@ -296,16 +348,8 @@
           </div>
 
           <div id="inspector2-outline">
-            <h2>Hover the click then click on another college to compare...</h2>
+            <h2>Hover on circle to view details...</h2>
           </div>
-        </div>
-      </div>
-
-      <div class="col col-3">
-        <div class="xButtonContainer">
-          <span class="arrow arrow-left" id="xArrowLeft"></span>
-          <button id="xButton" class="button">Admission Rate</button>
-          <span class="arrow" id="xArrowRight"></span>
         </div>
       </div>
     </div>
@@ -529,9 +573,13 @@
 
                 console.log("vars: ", name, cost, ad, debt, inc);
 
-                // only update first inspector if no circle is selected
+                // first college selected
                 if (numSelected == 0) {
                   console.log(c, name, cost);
+
+                  document.getElementById("inspector").style.display = "flex";
+                  document.getElementById("inspector-outline").style.display =
+                    "none";
 
                   document.getElementById("name").innerText = name;
                   document.getElementById("costText").innerText = cost;
@@ -557,6 +605,7 @@
                   // show
                   document.getElementById("detail-table2").style.visibility =
                     "visible";
+                  document.getElementById("compareText").style.display = "block";
                   document.getElementById("inspector2").style.display = "flex";
                 }
                 c.attr("r", r * 1.7);
@@ -577,19 +626,20 @@
                 var c = d3.select(this);
                 // set circle to selected
                 if (numSelected == 1) {
-                  document.getElementById("instruct").style.display = "none";
                   document.getElementById("inspector2-outline").style.display =
-                    "block";
-                  c.style("stroke", "black");
-                  c.attr("r", 12).transitiom().duration(500);
+                    "flex";
+                  c.attr("stroke", "black");
+                  c.attr("stroke-width", 4);
+                  c.attr("r", 20);
                 }
                 if (numSelected == 2) {
                   var costVals = compareValues("costText");
                   var incVals = compareValues("inText");
                   var adVals = compareValues("adText");
                   var debtVals = compareValues("debtText");
-                  c.style("stroke", "black");
-                  c.attr("r", 12).transitiom().duration(500);
+                  c.attr("stroke", "black");
+                  c.attr("stroke-width", 4);
+                  c.attr("r", 20);
 
                   addCompareValues(
                     "2",
