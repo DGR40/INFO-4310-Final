@@ -3,9 +3,15 @@
     <meta charset="utf-8" />
     <title>Project 3</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian&display=swap"
+      rel="stylesheet"
+    />
     <style>
       body {
-        font-family: "Georgia";
+        font-family: "Noto Sans Georgian", sans-serif;
       }
       .histo {
         background-color: #bbb;
@@ -88,8 +94,38 @@
       #inspector-header {
         text-align: center;
         border-bottom: 1px solid grey;
+        padding: 5px;
       }
       #details {
+        margin-left: 20px;
+        margin-right: 20px;
+      }
+
+      #inspector2 {
+        margin-top: 30px;
+        height: 370px;
+        width: 400px;
+        background-color: rgba(0, 0, 255, 0.231);
+        display: flex;
+        justify-content: flex-start;
+        flex-direction: column;
+        display: none;
+      }
+
+      #inspector2-outline {
+        margin-top: 30px;
+        height: 370px;
+        width: 400px;
+        border: 2px dashed grey;
+        display: none;
+        text-align: center;
+      }
+
+      #inspector-header2 {
+        text-align: center;
+        border-bottom: 1px solid grey;
+      }
+      #details2 {
         margin-left: 20px;
       }
 
@@ -121,9 +157,9 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        background-image: url('ivy_resized.png');
+        background-image: url("ivy_resized.png");
       }
-      h1{
+      h1 {
         color: black;
         background-color: white;
         text-align: center;
@@ -158,31 +194,65 @@
 
       <div class="col col-2">
         <svg id="scatter" width="800" height="800"></svg>
-        <div id="inspector">
-          <div id="inspector-header">
-            <h2 id="name">&nbsp;</h2>
+        <div>
+          <div id="inspector">
+            <div id="inspector-header">
+              <h2 id="name">Hover over a college to view details...</h2>
+            </div>
+            <div id="details">
+              <table id="detail-table">
+                <tbody>
+                  <tr>
+                    <td>Cost</td>
+                    <td id="costText">&nbsp;</td>
+                  </tr>
+                  <tr class="alt">
+                    <td>Admission Rate</td>
+                    <td id="adText">&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td>Debt</td>
+                    <td id="debtText">&nbsp;</td>
+                  </tr>
+                  <tr class="alt">
+                    <td>Median Income</td>
+                    <td id="inText">&nbsp;</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-          <div id="details">
-            <table id="detail-table">
-              <tbody>
-                <tr>
-                  <td>Cost</td>
-                  <td id="costText">&nbsp;</td>
-                </tr>
-                <tr class="alt">
-                  <td>Admission Rate</td>
-                  <td id="adText">&nbsp;</td>
-                </tr>
-                <tr>
-                  <td>Debt</td>
-                  <td id="debtText">&nbsp;</td>
-                </tr>
-                <tr class="alt">
-                  <td>Median Income</td>
-                  <td id="inText">&nbsp;</td>
-                </tr>
-              </tbody>
-            </table>
+
+          <div id="inspector2">
+            <div id="inspector-header">
+              <h2 id="name2">&nbsp;</h2>
+            </div>
+            <div id="details2">
+              <table id="detail-table2">
+                <tbody>
+                  <tr>
+                    <td>Cost</td>
+                    <td id="costText2">&nbsp;</td>
+                  </tr>
+                  <tr class="alt">
+                    <td>Admission Rate</td>
+                    <td id="adText2">&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td>Debt</td>
+                    <td id="debtText2">&nbsp;</td>
+                  </tr>
+                  <tr class="alt">
+                    <td>Median Income</td>
+                    <td id="inText2">&nbsp;</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div id="inspector2-outline">
+            <h2>Hover over another college to compare...</h2>
           </div>
         </div>
       </div>
@@ -207,7 +277,20 @@
         "ADM_RATE",
       ];
 
+      var numSelected = 0;
+
       var firstLoad = true;
+
+      function compareValues(type) {
+        console.log("looking for ", type);
+        var val1 = document.getElementById(type).innerText;
+        var val2 = document.getElementById(`${type}2`).innerText;
+
+        var percentChangeVal1 = val2 - val2 / val1;
+        var percentChangeVal2 = val1 - val2 / val2;
+
+        return [percentChangeVal1, percentChangeVal2];
+      }
 
       const createGraph = async function () {
         let ivies = await d3.csv("ivies.csv", d3.autoType);
@@ -374,26 +457,60 @@
                 var inc = c.attr("in");
                 var r = c.attr("r");
 
-                console.log(c, name, cost);
+                console.log("vars: ", name, cost, ad, debt, inc);
 
-                document.getElementById("name").innerText = name;
-                document.getElementById("costText").innerText = cost;
-                document.getElementById("adText").innerText = ad;
-                document.getElementById("debtText").innerText = debt;
-                document.getElementById("inText").innerText = inc;
+                // only update first inspector if no circle is selected
+                if (numSelected == 0) {
+                  console.log(c, name, cost);
 
-                document.getElementById("detail-table").style.visibility =
-                  "visible";
+                  document.getElementById("name").innerText = name;
+                  document.getElementById("costText").innerText = cost;
+                  document.getElementById("adText").innerText = ad;
+                  document.getElementById("debtText").innerText = debt;
+                  document.getElementById("inText").innerText = inc;
 
+                  document.getElementById("detail-table").style.visibility =
+                    "visible";
+                }
+
+                // update second inspector
+                const name1 = document.getElementById("name").innerText;
+                if (numSelected == 1 && name1 != name) {
+                  document.getElementById("inspector2-outline").style.display =
+                    "none";
+                  document.getElementById("name2").innerText = name;
+                  document.getElementById("costText2").innerText = cost;
+                  document.getElementById("adText2").innerText = ad;
+                  document.getElementById("debtText2").innerText = debt;
+                  document.getElementById("inText2").innerText = inc;
+
+                  // show
+                  document.getElementById("detail-table2").style.visibility =
+                    "visible";
+                  document.getElementById("inspector2").style.display = "flex";
+                }
                 c.attr("r", r * 1.4);
               })
               .on("mouseout", function (d) {
-                scatter.select("#annotations").selectAll("*").remove();
                 var c = d3.select(this);
-                var r = c.attr("r");
-                c.attr("r", r / 1.4);
+                if (c.style("stroke") !== "black") {
+                  var r = c.attr("r");
+                  c.attr("r", r / 1.4);
+                }
+              })
+              .on("click", function (d) {
+                numSelected++;
+                var c = d3.select(this);
+                // set circle to selected
+                if (numSelected == 1) {
+                  document.getElementById("inspector2-outline").style.display =
+                    "block";
+                }
+                if (numSelected == 2) {
+                  var compVals = compareValues("costText");
+                }
+                c.attr("stroke", "black");
               });
-
             firstLoad = false;
           }
         }
