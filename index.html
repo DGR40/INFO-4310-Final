@@ -32,7 +32,6 @@
         padding: 8px;
         width: 200px;
         border: none;
-        background-color: #ddd;
         cursor: pointer;
       }
       button:hover {
@@ -85,7 +84,24 @@
       }
 
       #yButtonContainer {
-        transform: translateY(-50%);
+        height:800px;
+        width:auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+
+      #yButton {
+        height:200px;
+        width:auto;
+        writing-mode: vertical-lr; 
+        transform: rotate(-180deg);
+        background-color: white;
+      }
+
+      #yButton > text {
+        transform: rotate(90deg);
       }
 
       /* #scatter.div {
@@ -234,11 +250,21 @@
         width:900px;
         background-color:rgb(239, 239, 239);
         border-radius:10px;
+        border:solid 1px black
       }
 
       .right {
         width:300px;
       }
+
+      .arrow-up {
+        transform: rotate(-90deg);
+      }
+
+      .arrow-down {
+        transform:rotate(90deg);
+      }
+
     </style>
   </head>
 
@@ -265,12 +291,12 @@
     </div>
 
     <div class="scatter-container">
-      <div class="left">
-        <div id="yButtonContainer">
-        <span class="arrow arrow-left" id="yArrowLeft"></span>
+      <div id="yButtonContainer">
+        <span class="arrow arrow-up" id="yArrowLeft"></span>
         <button class="button" id="yButton">Cost</button>
-        <span class="arrow" id="yArrowRight"></span>
+        <span class="arrow arrow-down" id="yArrowRight"></span>
       </div>
+      <div class="left">
         <svg id="scatter" width="800" height="800"></svg>
         <div class="col col-3">
           <div class="xButtonContainer">
@@ -678,16 +704,18 @@
                     "2",
                     costVals[0],
                     adVals[0],
-                    incVals[0],
-                    debtVals[0]
+                    
+                    debtVals[0],
+                    incVals[0]
                   );
 
                   addCompareValues(
                     "",
                     costVals[1],
                     adVals[1],
-                    incVals[1],
-                    debtVals[1]
+                    debtVals[1],
+                    incVals[1]
+                    
                   );
                 }
               });
