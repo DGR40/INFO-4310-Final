@@ -100,6 +100,21 @@
         background-color: white;
       }
 
+      .xButtonContainer {
+        margin-left:40px;
+        width:800px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
+      }
+
+      #xButton {
+        height:auto;
+        width:200px;
+        background-color: white;
+      }
+
       #yButton > text {
         transform: rotate(90deg);
       }
@@ -298,13 +313,6 @@
       </div>
       <div class="left">
         <svg id="scatter" width="800" height="800"></svg>
-        <div class="col col-3">
-          <div class="xButtonContainer">
-            <span class="arrow arrow-left" id="xArrowLeft"></span>
-            <button id="xButton" class="button">Admission Rate</button>
-            <span class="arrow" id="xArrowRight"></span>
-          </div>
-        </div>
       </div>
       
         <div class="comparer">
@@ -378,6 +386,11 @@
           </div>
         </div>
       </div>
+      <div class="xButtonContainer">
+            <span class="arrow arrow-left" id="xArrowLeft"></span>
+            <button id="xButton" class="button">Admission Rate</button>
+            <span class="arrow" id="xArrowRight"></span>
+          </div>
     </div>
 
     <script>
@@ -452,7 +465,7 @@
           const scatter = d3.select("#scatter");
           const swidth = scatter.attr("width");
           const sheight = scatter.attr("height");
-          const sMargin = { top: 10, right: 20, bottom: 40, left: 100 };
+          const sMargin = { top: 10, right: 20, bottom: 30, left: 70 };
           const sChartWidth = swidth - sMargin.right - sMargin.left;
           const sChartHeight = sheight - sMargin.top - sMargin.bottom;
 
