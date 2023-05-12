@@ -80,12 +80,16 @@
         flex-direction: row;
         flex-wrap: wrap;
         width: 50%;
+        margin: 0px;
       }
       .histo-text {
-        width: 40%;
+        width: 30%;
       }
       .histo-info{
-        width: 10%;
+        width: 25%;
+        margin: 0px;
+        display: flex;
+        flex-direction: column;
       }
 
       #yButtonContainer {
@@ -300,8 +304,9 @@
       .histo-legend .ivy{
         background-color: #FD9415;
       }
-
-
+      #school-list{
+        list-style-type: square;
+      }
     </style>
   </head>
 
@@ -942,10 +947,6 @@
           }
           return list;
         }
-
-        // create a function to prepare a list of schools 
-        // QUESTION - is there a way to recover the data points that fall into each point? Like if we want to show list of colleges
-        
 
         makeHistogram("#tuition", "COSTT4_A", "Average Annual Cost");
         makeHistogram("#debt", "GRAD_DEBT_MDN", "Median Debt");
