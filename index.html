@@ -74,20 +74,22 @@
         display: flex;
         flex-direction: row;
         height: 100vh;
+        justify-content: center;
       }
       .histos {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
-        width: 50%;
         margin: 0px;
+        width: 50%;
       }
       .histo-text {
-        width: 30%;
+        margin-left: 25vw;
+        margin-right: 25vw;
       }
       .histo-info{
-        width: 25%;
         margin: 0px;
+        width: 30%;
         display: flex;
         flex-direction: column;
       }
@@ -243,7 +245,7 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        background-image: url("ivy_resized.png");
+        background-image: url("ivy_resized_opacity.png");
         margin-bottom: 40px;
       }
       .header-text {
@@ -320,10 +322,14 @@
         </h3>
       </div>
     </header>
+    <div class="histo-text">
+        <p> It was <a href="https://www.britannica.com/topic/Ivy-League">only in 1956</a> that the purely athletic conference of the Ivy League was formally established. 
+          There were eight schools that became members - Harvard, Yale, University of Pennsylvania, Princeton, Columbia, Brown, Dartmouth, and Cornell - and they were 
+          originally competitive amongst their respective football teams. However, today, the connotation for Ivy League schools is that of its academic excellence: 
+          these schools are the best of the best ... 
+        </p>
+    </div>
     <div class="histo-section">
-      <div class="histo-text">
-        <p>Describe histograms here.</p>
-      </div>
       <div class="histos">
         <svg class="histo" id="tuition" width="300" height="300"></svg>
         <svg class="histo" id="debt" width="300" height="300"></svg>
