@@ -65,6 +65,21 @@
         transform: rotate(180deg);
       }
 
+      .x-out {
+        width: 30px;
+        height: 30px;
+        float:right;
+        cursor: pointer;
+        background-color: #6bbcd1;
+        border-radius: 8px;
+        text-align: center;
+        color:white;
+        justify-content: center;
+        display: flex;
+        flex-direction: column;
+
+      }
+
       .scatter-container {
         display: flex;
         flex-direction: row;
@@ -85,13 +100,7 @@
       .histo-text {
         width: 30%;
       }
-      .histo-info{
-        width: 25%;
-        margin: 0px;
-        display: flex;
-        flex-direction: column;
-      }
-
+     
       #yButtonContainer {
         height:800px;
         width:auto;
@@ -129,10 +138,11 @@
       }
 
       #inspector {
+        margin-top:10px;
+        width:90%;
         border-radius: 10px;
         box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
         height: 320px;
-        width: 370px;
         background-color: #dcdcdc;
         display: flex;
         justify-content: flex-start;
@@ -143,7 +153,6 @@
       #inspector-header {
         text-align: center;
         border-bottom: 1px solid grey;
-        padding: 5px;
       }
       #details {
         margin-left: 20px;
@@ -151,12 +160,16 @@
         color: #002947;
       }
 
+      .bold {
+        font-weight: bold;
+      }
+
       #inspector2 {
+        margin-top: 10px;
+        width:90%;
         border-radius: 10px;
         box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-        margin-top: 30px;
         height: 320px;
-        width: 370px;
         background-color: #002947;
         display: flex;
         justify-content: flex-start;
@@ -165,9 +178,9 @@
         display: none;
       }
       #inspector-outline {
-        margin-top: 30px;
+        margin-top: 10px;;
+        width:90%;
         height: 320px;
-        width: 370px;
         border: 2px dashed grey;
         border-radius: 10px;
         text-align: center;
@@ -178,9 +191,9 @@
       }
 
       #inspector2-outline {
-        margin-top: 30px;
+        width:90%;
+        margin-top:10px;
         height: 320px;
-        width: 370px;
         border: 2px dashed grey;
         border-radius: 10px;
         text-align: center;
@@ -200,15 +213,14 @@
         color: white;
       }
 
-      #compareText {
-        display: none;
-      }
-
       .comparer {
         border: 1px solid grey;
         border-radius:10px;
-        padding:10px;
         margin-left:10px;
+        display: flex;
+        width:370px;
+        flex-direction: column;
+        align-items: center;
       }
 
       .comparer > h1 {
@@ -264,6 +276,25 @@
         color: red;
       }
 
+      #clickText {
+        width:100%;
+        background-color: #6bbcd1;
+        justify-content: center;
+        text-align: center;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+      }
+
+      #compareText {
+        width:100%;
+        display: none;
+        background-color: #6bbcd1;
+        justify-content: center;
+        text-align: center;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+      }
+
       .left {
         width:900px;
         background-color:rgb(239, 239, 239);
@@ -283,8 +314,16 @@
         transform:rotate(90deg);
       }
       /* basic positioning */
+
+      .histo-info {
+        width:400px !important;
+        height:fit-content;
+        display: flex;
+      }
+
       .histo-legend { 
         list-style: none; 
+        padding:0px;
       }
       .histo-legend li { 
         float: left; 
@@ -305,7 +344,19 @@
         background-color: #FD9415;
       }
       #school-list{
-        list-style-type: square;
+        list-style-type: none;
+        position: relative;
+        padding:0px;
+        margin-left:20px;
+        width:300px;
+      }
+
+      #school-list>li:nth-child(odd) {
+        background-color: #f2f2f2;
+      }
+
+      .school-list-instructions {
+        background-color: white !important;
       }
     </style>
   </head>
@@ -330,12 +381,15 @@
         <svg class="histo" id="earnings" width="300" height="300"></svg>
         <svg class="histo" id="admission" width="300" height="300"></svg>
       </div>
-      <div class="histo-info">
+      <div class="histo-info comparer">
         <ul class="histo-legend">
           <li><span class="rest"></span> Non-Ivy Top 100 </li>
           <li><span class="ivy"></span> Ivy League Distribution </li>
         </ul>
         <ul id="school-list">
+          <li class="school-list-instructions"><span class="bold">Hover</span> over bars to see schools in that given range for both Ivy and Non-Ivy</li>
+          
+
         </ul>
       </div>
     </div>
@@ -351,15 +405,22 @@
       </div>
       
         <div class="comparer">
-          <h1>College Comparer</h1>
+          <div id="clickText"><p><span class="bold">Explore</span> data by toggling axes...<br />
+            <span class="bold">See</span> more info by hovering over schools...<br />
+          <span class='bold'>Compare</span> by clicking <span>two</span> schools..</p></div>
+
+           <div id="compareText"><p>
+          <span class='bold'>Compare</span> by clicking <span>2nd</span> school..</p></div>
+
           <div id="inspector-outline">
-            <h2>
-              Hover to glean details... <br />
-              Click on circle to compare...
-            </h2>
+            <p>
+              <span class='bold'>School 1</span>
+            </p>
           </div>
           <div id="inspector">
+            
             <div id="inspector-header">
+              <div class="x-out">X</div>
               <h2 id="name">&nbsp;</h2>
             </div>
             <div id="details">
@@ -385,8 +446,6 @@
               </table>
             </div>
           </div>
-
-          <div id="compareText"><h2>Click to compare...</h2></div>
 
           <div id="inspector2">
             <div id="inspector-header">
@@ -417,7 +476,10 @@
           </div>
 
           <div id="inspector2-outline">
-            <h2>Hover on circle to view details...</h2>
+            
+              <p class="bold">School 2</p>
+
+             
           </div>
         </div>
       </div>
@@ -684,7 +746,9 @@
 
                   inspect.attr("cost", cost).attr("ad", ad).attr("debt", debt).attr("inc", inc);
 
-
+                   document.getElementById("clickText").style.display =
+                    "flex";
+                 
                 }
 
                 // update second inspector
@@ -707,6 +771,8 @@
                   let inspect = d3.select("#inspector2")
 
                   inspect.attr("cost", cost).attr("ad", ad).attr("debt", debt).attr("inc", inc);
+
+                  
 
                 }
                 c.attr("r", r * 1.7);
@@ -731,9 +797,16 @@
                 if (numSelected == 1) {
                   document.getElementById("inspector2-outline").style.display =
                     "flex";
+                     document.getElementById("clickText").style.display =
+                    "none";
+                    document.getElementById("compareText").style.display =
+                    "flex";
+                  
                   c.attr("stroke", "black");
                   c.attr("stroke-width", 4);
                   c.attr("r", 20);
+
+
                 }
                 if (numSelected == 2) {
                   var costVals = compareValues("cost");
@@ -913,9 +986,11 @@
             let class_type = obj._groups[0][0].classList[0];
             if (class_type === "rest") {
               data = rest;
+               document.getElementById("school-list").innerText = "Non-Ivy Top 100s:"
             }
             else if (class_type === "ivy") {
               data = ivies;
+               document.getElementById("school-list").innerText = "Ivies:"
             }
             let schools = getSchools(d.x0, d.x1, data, attribute);
               // add new li to the ul 
@@ -931,6 +1006,7 @@
           function mouseOutRect(event, d) {
             let obj = d3.select(this);
             obj.style("stroke-width", 1);
+            document.getElementById("school-list").innerHTML = '<li class="school-list-instructions"><span class="bold">Hover</span> over bars to see schools in that given range for both Ivy and Non-Ivy</li>'
             d3.selectAll(".school").remove();
 
           }
