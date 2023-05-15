@@ -65,19 +65,27 @@
         transform: rotate(180deg);
       }
 
+      #delete1, #delete2 {
+        display: none;
+      }
+
       .x-out {
         width: 30px;
         height: 30px;
         float:right;
         cursor: pointer;
-        background-color: #6bbcd1;
+        background-color: #002947;
         border-radius: 8px;
         text-align: center;
         color:white;
         justify-content: center;
         display: flex;
         flex-direction: column;
+        display: none;
+      }
 
+      .x-out:hover {
+        color:#6bbcd1
       }
 
       .scatter-container {
@@ -162,6 +170,11 @@
         color: #002947;
       }
 
+      #details2 {
+        margin-left: 20px;
+        margin-right: 20px;
+      }
+
       .bold {
         font-weight: bold;
       }
@@ -172,7 +185,7 @@
         border-radius: 10px;
         box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
         height: 320px;
-        background-color: #002947;
+        background-color: #6bbcd1;
         display: flex;
         justify-content: flex-start;
         flex-direction: column;
@@ -207,11 +220,9 @@
 
       #inspector-header2 {
         text-align: center;
-        border-bottom: 1px solid grey;
+        border-bottom: 1px solid #002947;
       }
       #detail-table2 {
-        margin-left: 20px;
-        margin-right: 20px;
         color: white;
       }
 
@@ -245,8 +256,12 @@
         background-color: #f2f2f2;
       }
 
-      tr {
+      #detail-table > tbody > tr {
         border-bottom: 1px solid #aaaaaa;
+      }
+
+      #detail-table2 > tbody > tr {
+        border-bottom: 1px solid #002947 !important;
       }
 
       #detail-table {
@@ -362,7 +377,6 @@
       }
     </style>
   </head>
-
   <body>
     <header>
       <div class="header-text">
@@ -426,7 +440,7 @@
           <div id="inspector">
             
             <div id="inspector-header">
-              <div class="x-out">X</div>
+              <div class="x-out" id="delete1">X</div>
               <h2 id="name">&nbsp;</h2>
             </div>
             <div id="details">
@@ -454,7 +468,8 @@
           </div>
 
           <div id="inspector2">
-            <div id="inspector-header">
+            <div id="inspector-header2">
+              <div class="x-out" id="delete2">X</div>
               <h2 id="name2">&nbsp;</h2>
             </div>
             <div id="details2">
@@ -496,7 +511,10 @@
           </div>
     </div>
 
-    <script>
+ 
+  </body>
+
+  <script>
       // Define the initial button label and index of the label array
       var buttonLabels = ["Cost", "Debt", "Median Earnings", "Admission Rate"];
 
@@ -518,6 +536,8 @@
           return '$,'
         }
       }
+
+     
 
       function compareValues(type) {
         console.log("looking for ", type);
@@ -754,7 +774,6 @@
 
                    document.getElementById("clickText").style.display =
                     "flex";
-                 
                 }
 
                 // update second inspector
@@ -795,33 +814,47 @@
                 }
               })
               .on("click", function (d) {
-                numSelected++;
+                
                 let inspector = d3.select("#inspector")
                 let inspector2 = d3.select("#inspector2")
                 var c = d3.select(this);
+                let r = c.attr("r");
+                let name = c.attr("name")
                 // set circle to selected
-                if (numSelected == 1) {
+                c.attr("class", "point selected");
+                if (numSelected == 0) {
+                  numSelected++;
                   document.getElementById("inspector2-outline").style.display =
                     "flex";
                      document.getElementById("clickText").style.display =
                     "none";
                     document.getElementById("compareText").style.display =
                     "flex";
+                 
+                    
                   
                   c.attr("stroke", "black");
                   c.attr("stroke-width", 4);
-                  c.attr("r", 20);
-
-
+                  c.attr("r", r * 2)
                 }
-                if (numSelected == 2) {
+                const name1 = document.getElementById("name").innerText;
+                if (numSelected == 1 && name1 != name) {
+                  let firstSelected = document.getElementById("inspector").style.display == 'flex';
+                  console.log(firstSelected, "first selected =");
+                  if (firstSelected == true) {
+                    // do comparison as normal
+                    numSelected++;
+                    console.log("second not selected");
                   var costVals = compareValues("cost");
                   var incVals = compareValues("inc");
                   var adVals = compareValues("ad");
                   var debtVals = compareValues("debt");
                   c.attr("stroke", "black");
                   c.attr("stroke-width", 4);
-                  c.attr("r", 20);
+                  c.attr("r", r*2);
+                   c.attr("class", "point selected2");
+                    
+                  document.getElementById("delete2").style.display="flex"
 
                   addCompareValues(
                     "2",
@@ -840,11 +873,113 @@
                     incVals[1]
                     
                   );
+                  }
+                  // handle second selected and not first
+                  else {
+
+                  }
+                  
                 }
               });
             firstLoad = false;
           }
         }
+
+        let deleteButton2 = document.getElementById("delete2")
+        // handle deleting schools from comparer
+         deleteButton2.addEventListener("click", function () {
+          console.log("delete 2");
+          document.getElementById("inspector2").style.display = 'none';
+          document.getElementById("inspector2-outline").style.display = 'flex';
+          let c = d3.selectAll(".point.selected2");
+          let r = c.attr("r");
+          c.attr("stroke", "none");
+          c.attr("stroke-width", 0);
+          c.attr("r", r / 2)
+          numSelected = 1;
+          c.attr("class", "point")
+
+          // clear compareValues
+
+          // original values
+          let insp = d3.select("#inspector");
+          let cost = insp.attr("cost")
+          let ad = insp.attr("ad")
+          let debt = insp.attr("debt")
+          let inc = insp.attr("inc")
+
+        document.getElementById(`costText`).innerHTML = d3.format('$,')(cost)
+        document.getElementById(`adText`).innerHTML = d3.format('.000%')(ad)
+        document.getElementById(`debtText`).innerHTML = d3.format('$,')(debt)
+        document.getElementById(`inText`).innerHTML = d3.format('$,')(inc)
+
+        // add delete button 1
+        document.getElementById("delete1").style.display = "flex";
+
+        document.getElementById("delete2").style.display = "none";
+
+        }); 
+
+
+        let deleteButton1 = document.getElementById("delete1");
+        deleteButton1.addEventListener("click", function() {
+
+           let secondSelected = document.getElementById("inspector2").style.display == 'flex';
+
+           console.log("second is showing:", secondSelected);
+          
+           if (!secondSelected) {
+             // handles deleting first when there are no other selected
+          console.log("delete 1 with no second");
+          document.getElementById("inspector").style.display = 'none';
+          document.getElementById("inspector-outline").style.display = 'flex';
+          let c = d3.selectAll(".point.selected");
+          let r = c.attr("r");
+          c.attr("stroke", "none");
+          c.attr("stroke-width", 0);
+          c.attr("r", r / 2)
+          c.attr("class", "point")
+          numSelected = 0;
+          document.getElementById("compareText").style.display = 'none';
+          document.getElementById("clickText").style.display = 'flex';
+          document.getElementById("inspector2-outline").style.display = 'none';
+          document.getElementById("delete1").style.display = "none";
+           }
+ 
+        //  else {
+        //   // handles deleting first when second is selected
+        //   document.getElementById("inspector").style.display = 'none';
+        //   document.getElementById("inspector-outline").style.display = 'flex';
+
+        //   let c = d3.selectAll(".point.selected");
+        //   let r = c.attr("r");
+        //   c.attr("stroke", "none");
+        //   c.attr("stroke-width", 0);
+        //   c.attr("r", r / 2)
+        //   c.attr("class", "point");
+
+
+
+
+
+
+        //        // original values
+        //   let insp = d3.select("#inspector2");
+        //   let cost = insp.attr("cost")
+        //   let ad = insp.attr("ad")
+        //   let debt = insp.attr("debt")
+        //   let inc = insp.attr("inc")
+
+        // document.getElementById(`costText2`).innerHTML = d3.format('$,')(cost)
+        // document.getElementById(`adText2`).innerHTML = d3.format('.000%')(ad)
+        // document.getElementById(`debtText2`).innerHTML = d3.format('$,')(debt)
+        // document.getElementById(`inText2`).innerHTML = d3.format('$,')(inc)
+        //   }     
+        })
+
+
+
+
 
         function makeHistogram(svg, attribute, xlabel) {
           const histo = d3.select(svg);
@@ -992,11 +1127,11 @@
             let class_type = obj._groups[0][0].classList[0];
             if (class_type === "rest") {
               data = rest;
-               document.getElementById("school-list").innerText = "Non-Ivy Top 100s:"
+               document.getElementById("school-list").innerHTML = "<li class='bold school-list-instructions'>Non-Ivy Top 100s:<li>"
             }
             else if (class_type === "ivy") {
               data = ivies;
-               document.getElementById("school-list").innerText = "Ivies:"
+               document.getElementById("school-list").innerHTML = "<li class='bold school-list-instructions'>Ivies:<li>"
             }
             let schools = getSchools(d.x0, d.x1, data, attribute);
               // add new li to the ul 
@@ -1089,5 +1224,10 @@
 
       createGraph();
     </script>
-  </body>
+
+
+
+
+
+
 </html>
