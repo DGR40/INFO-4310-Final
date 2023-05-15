@@ -185,7 +185,7 @@
         border-radius: 10px;
         box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
         height: 320px;
-        background-color: #6bbcd1;
+        background-color: #bbb;
         display: flex;
         justify-content: flex-start;
         flex-direction: column;
@@ -462,6 +462,10 @@
                     <td>Median Income</td>
                     <td id="inText">&nbsp;</td>
                   </tr>
+                  <tr>
+                    <td>Retention</td>
+                    <td id="retText">&nbsp;</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -491,6 +495,10 @@
                     <td>Median Income</td>
                     <td id="inText2">&nbsp;</td>
                   </tr>
+                   <tr>
+                    <td>Retention</td>
+                    <td id="retText2">&nbsp;</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -516,13 +524,14 @@
 
   <script>
       // Define the initial button label and index of the label array
-      var buttonLabels = ["Cost", "Debt", "Median Earnings", "Admission Rate"];
+      var buttonLabels = ["Cost", "Debt", "Median Earnings", "Admission Rate", "Retention Rate"];
 
       var varLabels = [
         "COSTT4_A",
         "GRAD_DEBT_MDN",
         "MD_EARN_WNE_P10",
         "ADM_RATE",
+        "RET_FT4"
       ];
 
       var numSelected = 0;
@@ -530,7 +539,7 @@
       var firstLoad = true;
 
       function getFormat(variable) {
-        if (variable == "ADM_RATE") {
+        if (variable == "ADM_RATE" || variable == "RET_FT4") {
           return '.000%'
         } else {
           return '$,'
@@ -551,7 +560,7 @@
         var percentChangeVal1 = val2 - val1;
         var percentChangeVal2 = val1 - val2;
 
-        if (type == "ad") {
+        if (type == "ad" || type == 'ret') {
           percentChangeVal1 = val2 - val1;
           percentChangeVal2 = val1 - val2;
         }
@@ -569,13 +578,14 @@
         }
       }
 
-      function addCompareValues(inspector, cost, ad, debt, inc) {
+      function addCompareValues(inspector, cost, ad, debt, inc, ret) {
         document.getElementById(`costText${inspector}`).innerHTML +=
           getHTML(cost, '$,' );
         document.getElementById(`adText${inspector}`).innerHTML += getHTML(ad, '00.00%');
         document.getElementById(`debtText${inspector}`).innerHTML +=
           getHTML(debt, '$,');
         document.getElementById(`inText${inspector}`).innerHTML += getHTML(inc, '$,');
+        document.getElementById(`retText${inspector}`).innerHTML += getHTML(ret, '00.00%');
       }
 
       const createGraph = async function () {
@@ -726,6 +736,7 @@
                   .attr("ad", (d) => d["ADM_RATE"])
                   .attr("debt", (d) => d["GRAD_DEBT_MDN"])
                   .attr("in", (d) => d["MD_EARN_WNE_P10"])
+                  .attr("ret", (d) => d["RET_FT4"])
                   .attr("y", (d) => yScale(d[yVariable]))
                   .attr("cx", (d) => xScale(d[xVariable]))
                   .attr("cy", (d) => yScale(d[yVariable]))
@@ -747,6 +758,7 @@
                 var ad = c.attr("ad")
                 var debt = c.attr("debt");
                 var inc = c.attr("in");
+                var ret = c.attr("ret");
                 var r = c.attr("r");
 
                 console.log("vars: ", name, cost, ad, debt, inc);
@@ -764,13 +776,14 @@
                   document.getElementById("adText").innerText = d3.format('00.00%')(ad);
                   document.getElementById("debtText").innerText = d3.format('$,')(debt);
                   document.getElementById("inText").innerText = d3.format('$,')(inc);
+                  document.getElementById("retText").innerText = d3.format('00.00%')(ret);
 
                   document.getElementById("detail-table").style.visibility =
                     "visible";
 
                   let inspect = d3.select("#inspector")
 
-                  inspect.attr("cost", cost).attr("ad", ad).attr("debt", debt).attr("inc", inc);
+                  inspect.attr("cost", cost).attr("ad", ad).attr("debt", debt).attr("inc", inc).attr("ret", ret);
 
                    document.getElementById("clickText").style.display =
                     "flex";
@@ -779,6 +792,9 @@
                 // update second inspector
                 const name1 = document.getElementById("name").innerText;
                 if (numSelected == 1 && name1 != name) {
+
+                  document.getElementById("delete1").style.display = 'none';
+
                   document.getElementById("inspector2-outline").style.display =
                     "none";
                   document.getElementById("name2").innerText = name;
@@ -786,6 +802,7 @@
                   document.getElementById("adText2").innerText = d3.format('00.00%')(ad);
                   document.getElementById("debtText2").innerText = d3.format('$,')(debt);
                   document.getElementById("inText2").innerText = d3.format('$,')(inc);
+                  document.getElementById("retText2").innerText = d3.format('00.00%')(ret);
 
                   // show
                   document.getElementById("detail-table2").style.visibility =
@@ -795,7 +812,7 @@
 
                   let inspect = d3.select("#inspector2")
 
-                  inspect.attr("cost", cost).attr("ad", ad).attr("debt", debt).attr("inc", inc);
+                  inspect.attr("cost", cost).attr("ad", ad).attr("debt", debt).attr("inc", inc).attr("ret", ret);
 
                   
 
@@ -830,9 +847,6 @@
                     "none";
                     document.getElementById("compareText").style.display =
                     "flex";
-                 
-                    
-                  
                   c.attr("stroke", "black");
                   c.attr("stroke-width", 4);
                   c.attr("r", r * 2)
@@ -849,6 +863,7 @@
                   var incVals = compareValues("inc");
                   var adVals = compareValues("ad");
                   var debtVals = compareValues("debt");
+                  var retVals = compareValues("ret");
                   c.attr("stroke", "black");
                   c.attr("stroke-width", 4);
                   c.attr("r", r*2);
@@ -862,7 +877,8 @@
                     adVals[0],
                     
                     debtVals[0],
-                    incVals[0]
+                    incVals[0],
+                    retVals[0]
                   );
 
                   addCompareValues(
@@ -870,8 +886,8 @@
                     costVals[1],
                     adVals[1],
                     debtVals[1],
-                    incVals[1]
-                    
+                    incVals[1],
+                    retVals[1]
                   );
                   }
                   // handle second selected and not first
@@ -907,11 +923,14 @@
           let ad = insp.attr("ad")
           let debt = insp.attr("debt")
           let inc = insp.attr("inc")
+          let ret = insp.attr("ret")
 
         document.getElementById(`costText`).innerHTML = d3.format('$,')(cost)
         document.getElementById(`adText`).innerHTML = d3.format('.000%')(ad)
         document.getElementById(`debtText`).innerHTML = d3.format('$,')(debt)
         document.getElementById(`inText`).innerHTML = d3.format('$,')(inc)
+        document.getElementById(`retText`).innerHTML = d3.format('.000%')(ret)
+
 
         // add delete button 1
         document.getElementById("delete1").style.display = "flex";
@@ -1186,16 +1205,16 @@
         // Add click event listeners to the arrows
         xArrowLeft.addEventListener("click", function () {
           console.log("xArrowLeft");
-          xLabelIndex = (xLabelIndex - 1) % 4;
+          xLabelIndex = (xLabelIndex - 1) % 5;
           if (xLabelIndex < 0) {
-            xLabelIndex = 3;
+            xLabelIndex = 4;
           }
           xLabel.textContent = buttonLabels[xLabelIndex];
           makeScatter(xLabelIndex, yLabelIndex);
         });
         xArrowRight.addEventListener("click", function () {
-          if (xLabelIndex < 3) {
-            xLabelIndex = (xLabelIndex + 1) % 4;
+          if (xLabelIndex < 4) {
+            xLabelIndex = (xLabelIndex + 1) % 5;
           } else {
             xLabelIndex = 0;
           }
@@ -1204,16 +1223,16 @@
         });
 
         yArrowLeft.addEventListener("click", function () {
-          yLabelIndex = (yLabelIndex - 1) % 4;
+          yLabelIndex = (yLabelIndex - 1) % 5;
           if (yLabelIndex < 0) {
-            yLabelIndex = 3;
+            yLabelIndex = 4;
           }
           yLabel.textContent = buttonLabels[yLabelIndex];
           makeScatter(xLabelIndex, yLabelIndex);
         });
         yArrowRight.addEventListener("click", function () {
-          if (yLabelIndex < 3) {
-            yLabelIndex = (yLabelIndex + 1) % 4;
+          if (yLabelIndex < 4) {
+            yLabelIndex = (yLabelIndex + 1) % 5;
           } else {
             yLabelIndex = 0;
           }
