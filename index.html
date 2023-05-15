@@ -1203,7 +1203,6 @@ var g = svg.append("g")
           let total_values = total.map((d) => d[attribute]);
           let rest_values = rest.map((d) => d[attribute]);
           let minMax = d3.extent(total_values);
-          console.log("extent", minMax);
           let ivy_values = ivies.map((d) => d[attribute]);
 
           let xScale = d3
