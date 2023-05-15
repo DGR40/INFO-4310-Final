@@ -90,23 +90,26 @@
 
       .scatter-container {
         display: flex;
-        flex-direction: row;
+        flex-direction: row;        
+        margin-top: 15vh;
+        margin-bottom: 15vh;
       }
 
       .histo-section {
         display: flex;
         flex-direction: row;
-        height: 100vh;
         justify-content: center;
+        margin-top: 15vh;
+        margin-bottom: 15vh;
       }
       .histos {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
         margin: 0px;
-        width: 50%;
+        width: 60%;
       }
-      .histo-text {
+      .info-text {
         margin-left: 25vw;
         margin-right: 25vw;
       }
@@ -406,19 +409,24 @@
         </h3>
       </div>
     </header>
-    <div class="histo-text">
+    <div class="info-text">
         <p> It was <a href="https://www.britannica.com/topic/Ivy-League">only in 1956</a> that the purely athletic conference of the Ivy League was formally established. 
           There were eight schools that became members - Harvard, Yale, University of Pennsylvania, Princeton, Columbia, Brown, Dartmouth, and Cornell - and they were 
           originally competitive amongst their respective football teams. However, today, the connotation for Ivy League schools is that of its academic excellence: 
-          these schools are the best of the best ... 
+          these schools are considered the best of the best and many students aspire to earn a spot in one of their graduating classes from a very younge age. With the 
+          help of data pulled from the US Department of Education, we hope that our visualizations will aid you (yes, you!) in making educated decisions, comparisons,
+          and analyzes of the education offered at the top 100 universities in the United States as a whole. The histograms below plot the distribution of the Ivy versus 
+          non-Ivy League schools pertaining to the variables of average annual cost, median debt accrued post graduation, median earnings post graduation, the admission 
+          rate of students, and the retention rate of students after their first year. 
         </p>
     </div>
     <div class="histo-section">
       <div class="histos">
-        <svg class="histo" id="tuition" width="300" height="300"></svg>
-        <svg class="histo" id="debt" width="300" height="300"></svg>
-        <svg class="histo" id="earnings" width="300" height="300"></svg>
-        <svg class="histo" id="admission" width="300" height="300"></svg>
+        <svg class="histo" id="tuition" width="250" height="300"></svg>
+        <svg class="histo" id="debt" width="250" height="300"></svg>
+        <svg class="histo" id="earnings" width="250" height="300"></svg>
+        <svg class="histo" id="admission" width="250" height="300"></svg>
+        <svg class="histo" id="retention" width="250" height="300"></svg>
       </div>
       <div class="histo-info comparer">
         <ul class="histo-legend">
@@ -431,6 +439,30 @@
 
         </ul>
       </div>
+    </div>
+
+    <div class="info-text">
+      <p> Some oberservations: </p>
+      <p> 1. With the Ivy League distribution superimposed on the distribution for the Non-Ivy group, it is relatively easy to compare and contrast the 
+        distributions of both groups. Interestingly, all of the Ivy League schools have very selective admission rates (correlating to their 
+        perceived academic excellence) but also have extremely high tuition costs. Nevertheless, it seems like the median debt is lower and 
+        median earnings are generally higher. Could the high admission cost be balanced out by the promise of high earnings and a low debt? </p>
+      <p> 2. On the median earnings graph, there are two clear outliers from the rest of the distribution: the Massachusetts Institute of 
+        Technology and the California Institute of Technology. These schools fall in the range of $110,000-112,000 of median earnings: 
+        a very nice salary for post graduation.
+      </p>
+      <p> 3. Lastly, there are also outliers on the retention rate histogram. Harvard and Princeton, the lowest of all the Ivies, have retention
+        rates that are at the bottom of the non-Ivy distribution. Of course, there are many factors that could relate to these seemingly very 
+        low retention rates. Perhaps a fraction of students who are admitted to these Ivy League schools simply cannot keep up with the 
+        academic rigor of the instituion and the level of their peers.</p>
+        <br> 
+      <p> 
+        The scatterplot below takes the 5 variables from the histograms and plots them on each axis with the ability to change the axes 
+        however you see fit. With this more detailed view, it is possible to view the relationship between two of the variables seen above 
+        in the histograms. In addition, the Ivy and non-Ivy schools are differentiated by color. Use this interactive tool in order to 
+        get further insight into general trends, as well as specific information for any university you wish. Use the college comparer 
+        tool to directly compare the stastics of two distinct schools. 
+      </p>  
     </div>
 
     <div class="scatter-container">
@@ -1075,29 +1107,33 @@
             );
 
           // histograms
+          let total_values = total.map((d) => d[attribute]);
           let rest_values = rest.map((d) => d[attribute]);
-          let rest_minMax = d3.extent(rest_values);
+          let minMax = d3.extent(total_values);
+          console.log("extent", minMax);
           let ivy_values = ivies.map((d) => d[attribute]);
 
           let xScale = d3
             .scaleLinear()
-            .domain(rest_minMax)
+            .domain(minMax)
             .range([0, histoWidth]);
           let bottomAxis = d3.axisBottom(xScale);
 
           let numBins = 10;
-          let histoGen = d3.histogram().domain(rest_minMax).thresholds(numBins);
+          let histoGen = d3.histogram().domain(minMax).thresholds(numBins);
 
           // the smaller rectangles are from the fact that it's not even distribution in the bins right?
+          let total_bins = histoGen(total_values);
           let rest_bins = histoGen(rest_values);
-          console.log("rest histo", rest_bins);
           let ivy_bins = histoGen(ivy_values);
-          console.log("ivy histo", ivy_bins);
+
+          let y_extent = d3.extent(total_bins, (d) => d.length);
+          let max_y = y_extent[1];
 
           // y axis
           let yScale = d3
             .scaleLinear()
-            .domain(d3.extent(rest_bins, (d) => d.length))
+            .domain([0,max_y])
             .range([histoHeight, 0]);
 
           let leftAxis = d3.axisLeft(yScale);
@@ -1201,13 +1237,15 @@
             let obj = d3.select(this);
             obj.style("stroke-width", 3);
             let class_type = obj._groups[0][0].classList[0];
+            let range = d.x0.toString() + "-" + d.x1.toString();
             if (class_type === "rest") {
               data = rest;
-               document.getElementById("school-list").innerHTML = "<li class='bold school-list-instructions'>Non-Ivy Top 100s:<li>"
+              document.getElementById("school-list").innerHTML = `<li class='bold school-list-instructions'>Non-Ivy Top 100s: ${range} <li>`
             }
             else if (class_type === "ivy") {
+              let hi_test = "Hey!";
               data = ivies;
-               document.getElementById("school-list").innerHTML = "<li class='bold school-list-instructions'>Ivies:<li>"
+              document.getElementById("school-list").innerHTML = `<li class='bold school-list-instructions'>Ivies: ${range} <li>`
             }
             let schools = getSchools(d.x0, d.x1, data, attribute);
               // add new li to the ul 
@@ -1245,6 +1283,7 @@
         makeHistogram("#debt", "GRAD_DEBT_MDN", "Median Debt");
         makeHistogram("#earnings", "MD_EARN_WNE_P10", "Median Earnings");
         makeHistogram("#admission", "ADM_RATE", "Admission Rate");
+        makeHistogram("#retention", "RET_FT4", "Retention Rate");
         makeScatter(3, 0);
 
         // update the axis for the scatter plot
