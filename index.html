@@ -13,6 +13,10 @@
       body {
         font-family: "Georgia", sans-serif;
       }
+
+      p {
+        font-size: 18px;
+      }
       .histo {
         background-color: rgb(239, 239, 239);
         margin: 10px;
@@ -91,7 +95,13 @@
       .scatter-container {
         display: flex;
         flex-direction: row;        
-        margin-top: 15vh;
+      }
+
+      .scatter-container-full {
+        display:flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
       }
 
       .histo-section {
@@ -99,18 +109,22 @@
         flex-direction: row;
         justify-content: center;
         margin-top: 15vh;
-        margin-bottom: 15vh;
       }
       .histos {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         flex-wrap: wrap;
         margin: 0px;
         width: 60%;
       }
       .info-text {
-        margin-left: 25vw;
-        margin-right: 25vw;
+        margin-left: 30vw;
+        margin-right: 30vw;
+        text-align: justify;
+      }
+
+      .info-text2 {
+        margin-top:10vh;
       }
      
       #yButtonContainer {
@@ -131,7 +145,7 @@
       }
 
       .xButtonContainer {
-        margin-left:40px;
+        margin-right:400px;
         width:800px;
         display: flex;
         align-items: center;
@@ -338,6 +352,19 @@
         width:400px !important;
         height:fit-content;
         display: flex;
+        position: sticky;
+    top: 20;
+      }
+
+      .histo-container {
+        display: flex;
+        text-align: justify;
+      }
+
+      .histo-explanation {
+        width:400px;
+        flex-wrap: wrap;
+        margin-left:50px;
       }
 
       .histo-legend { 
@@ -447,13 +474,49 @@
     </div>
     <div class="histo-section">
       <div class="histos">
-        <svg class="histo" id="tuition" width="250" height="300"></svg>
-        <svg class="histo" id="debt" width="250" height="300"></svg>
-        <svg class="histo" id="earnings" width="250" height="300"></svg>
-        <svg class="histo" id="admission" width="250" height="300"></svg>
-        <svg class="histo" id="retention" width="250" height="300"></svg>
+        <div class="histo-container">
+          <svg class="histo" id="tuition" width="300" height="350"></svg>
+          <p class="histo-explanation">To begin our analysis, let's look at the distribution of average annual cost 
+            of both Ivy and Non-Ivy schools. 
+            Here we see that the Ivies are by far the most expensive, with 
+            the exception of University of Chicago being the most expensive school out of the top 100 universities. 
+            Evidently, Ivies are generally more expensive, but is the high tuition worth it for the student... </p>
+        </div>
+        
+         <div class="histo-container">
+          <svg class="histo" id="debt" width="300" height="350"></svg>
+          <p class="histo-explanation">The first measure to assess if the high tuition is worth it is Median Debt. Interestingly enough, Ivy league students seem to accrue less debt than most other top 100 universities, 
+            with the exception being Columbia which has an average debt of over $20,000. This suggests that Ivy's do a better job than most other top universities 
+            in ensuring their students can obtain their education without setting themselves up for future financial struggles. The story does not end here, however.
+            Now let us look at the median earnings out of college... </p>
+         </div>
+
+         <div class="histo-container">
+           <svg class="histo" id="earnings" width="300" height="350"></svg>
+           <p class="histo-explanation">In fact, it does seem that Ivies set their 
+            students up for lucrative careers as they generally have equal or higher median earnings compared to the other top universities. It is worth pointing out that the two schools with the highest median earnings are not Ivies: Cal Tech and M.I.T.
+            Furthermore, there are many (32) non-Ivies that have equal or greater earnings than the Ivies, so perhaps the "elite" distinction has less of an impact on earnings than expected. Regardless, even if the Ivies are worth it, what are the chances a prospective student even gets in?   </p>
+         </div>
+        
+       <div class="histo-container">
+         <svg class="histo" id="admission" width="300" height="350"></svg>
+         <p class="histo-explanation">The chances look rather bleak as all Ivies besides Cornell have admission rates below 10%. Interestingly enough, 
+          the distribution of admission rates across the top 100 universities is incredibly wide. Going all the way up to greater than 95%. Perhaps just because a school is easy 
+          to get into does not mean you are receiving any less valuable of an education...    </p>
+       </div>
+
+       <div class="histo-container">
+        <svg class="histo" id="retention" width="300" height="350"></svg>
+        <p class="histo-explanation">
+          Finally, even if a prospective student does get into an Ivy, what are the chances that student remains enrolled after his/her first year? Surprisingly, 
+          the Ivies are not clumped together as they are in the previous graphs. In fact, Yale University has the lowest retention rate, seconded by Harvard.
+          At the same time, the other top 100 schools mostly have retention rates between 0.90 and 0.99. 
+        </p>
+       </div>
+       
+        
       </div>
-      <div class="histo-info comparer">
+      <div class="histo-info comparer" id="histo-info">
         <ul class="histo-legend">
           <li><span class="rest"></span> Non-Ivy Top 100 </li>
           <li><span class="ivy"></span> Ivy League Distribution </li>
@@ -466,33 +529,21 @@
       </div>
     </div>
 
-    <div class="info-text">
-      <p> Some oberservations: </p>
-      <p> 1. With the Ivy League distribution superimposed on the distribution for the Non-Ivy group, it is relatively easy to compare and contrast the 
-        distributions of both groups. Interestingly, all of the Ivy League schools have very selective admission rates (correlating to their 
-        perceived academic excellence) but also have extremely high tuition costs. Nevertheless, it seems like the median debt is lower and 
-        median earnings are generally higher. Could the high admission cost be balanced out by the promise of high earnings and a low debt? </p>
-      <p> 2. On the median earnings graph, there are two clear outliers from the rest of the distribution: the Massachusetts Institute of 
-        Technology and the California Institute of Technology. These schools fall in the range of $110,000-112,000 of median earnings: 
-        a very nice salary for post graduation.
-      </p>
-      <p> 3. Lastly, there are also outliers on the retention rate histogram. Yale, Harvard and Princeton, the lowest on the distribution 
-        of all the Ivies, have retention
-        rates that are at the bottom of the non-Ivy distribution. Of course, there are many factors that could relate to these seemingly very 
-        low retention rates. Perhaps a fraction of students who are admitted to these Ivy League schools simply cannot keep up with the 
-        academic rigor of the instituion and the level of their peers.</p>
-        <br> 
-      <p> 
-        The scatterplot below takes the 5 variables from the histograms and plots them on each axis with the ability to change the axes 
-        however you see fit. With this more detailed view, it is possible to view the relationship between two of the variables seen above 
-        in the histograms. In addition, the Ivy and non-Ivy schools are differentiated by color. Use this interactive tool in order to 
-        get further insight into general trends, as well as specific information for any university you wish. Use the college comparer 
-        tool to directly compare the stastics of two distinct schools. 
+    <div class="info-text info-text2">
+      <p>
+        Now that we have taken a pretty broad overview of the Ivy vs. Non-Ivy schools, use the 
+        interactive scatterplot below to explore individual schools and trends between the school statistics 
+        we looked at above. The Ivies are <span style="color:#FD9415">orange</span> dots and the other top 100 are the <span style="color:#6bbcd1">blue</span> dots.
+        By clicking the arrows on the axes, you can change the variables on each as you see fit.
+        Furthermore, by hovering over a school you can see the breakdown of that school's statistics. Lastly, click on
+        two schools of interest in order to compare their statistics head to head. You be the judge, are the Ivies really worth it?
       </p>  
     </div>
 
-    <div class="scatter-container">
-      <div id="yButtonContainer">
+    <div class="scatter-container-full">
+      <h1>Top College Explorer</h1>
+      <div class="scatter-container">
+        <div id="yButtonContainer">
         <span class="arrow arrow-up" id="yArrowLeft"></span>
         <button class="button" id="yButton">Cost</button>
         <span class="arrow arrow-down" id="yArrowRight"></span>
@@ -604,17 +655,24 @@
         </div>
       </div>
 
-      <div class="xButtonContainer">
+        <div class="xButtonContainer">
             <span class="arrow arrow-left" id="xArrowLeft"></span>
             <button id="xButton" class="button">Admission Rate</button>
             <span class="arrow" id="xArrowRight"></span>
-          </div>
+      </div>
+      
+      </div>
+
+    
       
     </div>
 
   </body>
 
   <script>
+
+    
+
 
     let raceToggle1 = document.getElementById("raceToggle1")
     raceToggle1.addEventListener("click", function() {
