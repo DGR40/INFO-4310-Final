@@ -440,7 +440,7 @@
           originally competitive amongst their respective football teams. However, today, the connotation for Ivy League schools is that of its academic excellence: 
           these schools are considered the best of the best and many students aspire to earn a spot in one of their graduating classes from a very younge age. With the 
           help of data pulled from the US Department of Education, we hope that our visualizations will aid you (yes, you!) in making educated decisions, comparisons,
-          and analyzes of the education offered at the top 100 universities in the United States as a whole. The histograms below plot the distribution of the Ivy versus 
+          and analyses of the education offered at the top 100 universities in the United States as a whole. The histograms below plot the distribution of the Ivy versus 
           non-Ivy League schools pertaining to the variables of average annual cost, median debt accrued post graduation, median earnings post graduation, the admission 
           rate of students, and the retention rate of students after their first year. 
         </p>
@@ -476,7 +476,8 @@
         Technology and the California Institute of Technology. These schools fall in the range of $110,000-112,000 of median earnings: 
         a very nice salary for post graduation.
       </p>
-      <p> 3. Lastly, there are also outliers on the retention rate histogram. Harvard and Princeton, the lowest of all the Ivies, have retention
+      <p> 3. Lastly, there are also outliers on the retention rate histogram. Yale, Harvard and Princeton, the lowest on the distribution 
+        of all the Ivies, have retention
         rates that are at the bottom of the non-Ivy distribution. Of course, there are many factors that could relate to these seemingly very 
         low retention rates. Perhaps a fraction of students who are admitted to these Ivy League schools simply cannot keep up with the 
         academic rigor of the instituion and the level of their peers.</p>
@@ -603,29 +604,20 @@
         </div>
       </div>
 
-
-
-
-
       <div class="xButtonContainer">
             <span class="arrow arrow-left" id="xArrowLeft"></span>
             <button id="xButton" class="button">Admission Rate</button>
             <span class="arrow" id="xArrowRight"></span>
           </div>
-
-
       
     </div>
 
-   
- 
   </body>
 
   <script>
 
     let raceToggle1 = document.getElementById("raceToggle1")
     raceToggle1.addEventListener("click", function() {
-      console.log("toggled!");
       if (document.getElementById("detail-table").style.display != 'none') {
         document.getElementById("detail-table").style.display='none';
         document.getElementById("race1").style.display='flex';
@@ -645,7 +637,6 @@
 
     let raceToggle2 = document.getElementById("raceToggle2")
     raceToggle2.addEventListener("click", function() {
-      console.log("toggled!");
       if (document.getElementById("detail-table2").style.display != 'none') {
         document.getElementById("detail-table2").style.display='none';
         document.getElementById("race2").style.display='flex';
@@ -664,88 +655,51 @@
     })
 
     function makeBarChart(data, inspector) {
-
-      console.log("making chart with data: ", data);
-
       d3.select(`#race${inspector}`).selectAll("*").remove()
-
       var svg = d3.select(`#race${inspector}`).append("svg").attr("width", 370).attr("height", 200).attr("id", `raceChart${inspector}`)
-
       let width = 250, height = 140
+      var xScale = d3.scaleBand().range([0, width]).padding(0.4),
+                  yScale = d3.scaleLinear().range([height, 0]);
 
-var xScale = d3.scaleBand().range([0, width]).padding(0.4),
-            yScale = d3.scaleLinear().range([height, 0]);
+      var g = svg.append("g")
+                  .attr("transform", "translate(" + 35 + "," + 20 + ")");
 
-var g = svg.append("g")
-            .attr("transform", "translate(" + 35 + "," + 20 + ")");
+      xScale.domain(data.map(function(d) { return d.label; }));
+      yScale.domain([0, 1]);
 
-        xScale.domain(data.map(function(d) { return d.label; }));
-        yScale.domain([0, 1]);
+      g.append("g")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(xScale))
+          .selectAll("text") 
+          .style("text-anchor", "end")
+          .attr("dx", "-.8em")
+          .attr("dy", ".15em")
+          .attr("transform", "rotate(-65)")
+          .attr("font-size", 7);
 
-        g.append("g")
-         .attr("transform", "translate(0," + height + ")")
-         .call(d3.axisBottom(xScale))
-         .selectAll("text") 
-        .style("text-anchor", "end")
-        .attr("dx", "-.8em")
-        .attr("dy", ".15em")
-        .attr("transform", "rotate(-65)")
-        .attr("font-size", 7);
-
-        g.append("g")
-         .call(d3.axisLeft(yScale).tickFormat(function(d){
-             return d3.format("00.00%")(d);
-         }));
+      g.append("g")
+        .call(d3.axisLeft(yScale).tickFormat(function(d){
+            return d3.format("00.00%")(d);
+      }));
 
 
-        g.selectAll(".bar")
-         .data(data)
-         .enter().append("rect")
-         .attr("class", "bar")
-         .attr("x", function(d) { return xScale(d.label); })
-         .attr("y", function(d) { return yScale(d.value); })
-         .attr("width", xScale.bandwidth())
-         .attr("height", function(d) { return height - yScale(d.value); })
-         .attr("fill", (d, i) => d3.schemeCategory10[i]);
+      g.selectAll(".bar")
+        .data(data)
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", function(d) { return xScale(d.label); })
+        .attr("y", function(d) { return yScale(d.value); })
+        .attr("width", xScale.bandwidth())
+        .attr("height", function(d) { return height - yScale(d.value); })
+        .attr("fill", (d, i) => d3.schemeCategory10[i]);
 
-         svg.append("text")
-   .attr("x", width/2 + 30)
-   .attr("y", 15)
-   .attr("text-anchor", "middle")
-   .style("font-size", "16px")
-   .text("Undergrad Race Demographics");
+      svg.append("text")
+        .attr("x", width/2 + 30)
+        .attr("y", 15)
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .text("Undergrad Race Demographics");
     }
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
       // Define the initial button label and index of the label array
@@ -771,16 +725,11 @@ var g = svg.append("g")
         }
       }
 
-     
-
       function compareValues(type) {
-        console.log("looking for ", type);
         let inspector = d3.select("#inspector");
         let inspector2 = d3.select("#inspector2")
         var val1 = inspector.attr(type);
         var val2 = inspector2.attr(type);
-
-        console.log("values: ", val1, val2);
 
         var percentChangeVal1 = val2 - val1;
         var percentChangeVal2 = val1 - val2;
@@ -789,8 +738,6 @@ var g = svg.append("g")
           percentChangeVal1 = val2 - val1;
           percentChangeVal2 = val1 - val2;
         }
-
-        console.log(percentChangeVal1);
 
         return [percentChangeVal1, percentChangeVal2];
       }
@@ -817,7 +764,6 @@ var g = svg.append("g")
         let ivies = await d3.csv("ivies.csv", d3.autoType);
         let rest = await d3.csv("rest.csv", d3.autoType);
         let total = await d3.csv("top_data.csv", d3.autoType);
-        console.log(total);
 
         function makeScatter(xIndex, yIndex) {
           const scatter = d3.select("#scatter");
@@ -830,8 +776,6 @@ var g = svg.append("g")
           var xVariable = varLabels[xIndex];
           var yVariable = varLabels[yIndex];
 
-          //console.log(sChartHeight, sChartWidth);
-
           let annotations = scatter.append("g").attr("id", "annotations");
           let scatterArea = scatter
             .append("g")
@@ -841,8 +785,6 @@ var g = svg.append("g")
               "translate(" + sMargin.left + "," + sMargin.top + ")"
             );
 
-          // whatever variables the user chooses, need to adjust this code to deal with the variables that the user can choose
-          // maybe create it's own function that reacts to what the user inputs
           const xExtent = d3.extent(total, (d) => d[xVariable]);
           const yExtent = d3.extent(total, (d) => d[yVariable]);
           const rExtent = d3.extent(total, (d) => d["UGDS"]);
@@ -851,7 +793,7 @@ var g = svg.append("g")
             .scaleLinear()
             .domain(xExtent)
             .range([0, sChartWidth]);
-          // switching min and max to account for SVG coordinates
+
           const yScale = d3
             .scaleLinear()
             .domain(yExtent)
@@ -859,12 +801,9 @@ var g = svg.append("g")
 
           const rScale = d3.scaleLinear().domain(rExtent).range([4, 10]);
 
-          // part C
-
           let yFormat = getFormat(yVariable);
           let xFormat = getFormat(xVariable);
 
-          // left axis
           let sLeftAxis = d3.axisLeft(yScale);
           annotations
             .append("g")
@@ -875,7 +814,6 @@ var g = svg.append("g")
             );
           sLeftAxis.tickFormat(d3.format(yFormat));
 
-          // left gridlines
           let sLeftGridlines = d3
             .axisLeft(yScale)
             .tickSize(-sChartWidth - 10)
@@ -889,7 +827,6 @@ var g = svg.append("g")
               `translate(${sMargin.left - 10},${sMargin.top})`
             );
 
-          // bottom axis
           let sBottomAxis = d3.axisBottom(xScale);
           annotations
             .append("g")
@@ -901,7 +838,6 @@ var g = svg.append("g")
             )
           sBottomAxis.tickFormat(d3.format(xFormat));
 
-          // bottom gridlines
           let sBottomGridlines = d3
             .axisBottom(xScale)
             .tickSize(-sChartHeight - 10)
@@ -938,7 +874,6 @@ var g = svg.append("g")
 
           // just adjust points
           if (firstLoad == false) {
-            console.log("second load");
             scatter
               .selectAll(".point")
               .transition()
@@ -948,7 +883,6 @@ var g = svg.append("g")
           }
           // create initial points on first load
           else {
-            console.log("first load");
             scatterArea
               .selectAll("circle")
               .data(total)
@@ -982,7 +916,6 @@ var g = svg.append("g")
                 }
               })
               .on("mouseover", function (d) {
-                console.log("moused over");
                 // Get the name of the circle
                 var c = d3.select(this);
                 var name = c.attr("name");
@@ -1003,13 +936,8 @@ var g = svg.append("g")
 
                 let raceData = [{label: "White", value: white}, {label: "Black", value: black}, {label: "Hispanic", value: hisp}, {label: "Asian", value: asian}, {label: "Other", value: aian + nhpi}];
 
-                console.log("vars: ", name, cost, ad, debt, inc);
-
                 // first college selected
                 if (numSelected == 0) {
-
-
-                  console.log(c, name, cost);
 
                   document.getElementById("race1").style.display = 'none';
                   document.getElementById("raceChart1").style.display = 'none';
@@ -1122,11 +1050,9 @@ var g = svg.append("g")
                   document.getElementById("raceToggle2").style.display = 'flex';
 
                   let firstSelected = document.getElementById("inspector").style.display == 'flex';
-                  console.log(firstSelected, "first selected =");
                   if (firstSelected == true) {
                     // do comparison as normal
                     numSelected++;
-                    console.log("second not selected");
                   var costVals = compareValues("cost");
                   var incVals = compareValues("inc");
                   var adVals = compareValues("ad");
@@ -1181,7 +1107,6 @@ var g = svg.append("g")
         let deleteButton2 = document.getElementById("delete2")
         // handle deleting schools from comparer
          deleteButton2.addEventListener("click", function () {
-          console.log("delete 2");
           document.getElementById("inspector2").style.display = 'none';
           document.getElementById("inspector2-outline").style.display = 'flex';
           let c = d3.selectAll(".point.selected2");
@@ -1223,64 +1148,31 @@ var g = svg.append("g")
         deleteButton1.addEventListener("click", function() {
 
            let secondSelected = document.getElementById("inspector2").style.display == 'flex';
-
-           console.log("second is showing:", secondSelected);
           
            if (!secondSelected) {
              // handles deleting first when there are no other selected
-          console.log("delete 1 with no second");
-          document.getElementById("inspector").style.display = 'none';
-          document.getElementById("inspector-outline").style.display = 'flex';
-          let c = d3.selectAll(".point.selected");
-          let r = c.attr("r");
-          c.attr("stroke", "none");
-          c.attr("stroke-width", 0);
-          c.attr("r", r / 2)
-          c.attr("class", "point")
-          numSelected = 0;
-          document.getElementById("compareText").style.display = 'none';
-          document.getElementById("clickText").style.display = 'flex';
-          document.getElementById("inspector2-outline").style.display = 'none';
-          document.getElementById("delete1").style.display = "none";
+                document.getElementById("inspector").style.display = 'none';
+                document.getElementById("inspector-outline").style.display = 'flex';
+                let c = d3.selectAll(".point.selected");
+                let r = c.attr("r");
+                c.attr("stroke", "none");
+                c.attr("stroke-width", 0);
+                c.attr("r", r / 2)
+                c.attr("class", "point")
+                numSelected = 0;
+                document.getElementById("compareText").style.display = 'none';
+                document.getElementById("clickText").style.display = 'flex';
+                document.getElementById("inspector2-outline").style.display = 'none';
+                document.getElementById("delete1").style.display = "none";
            }
- 
-        //  else {
-        //   // handles deleting first when second is selected
-        //   document.getElementById("inspector").style.display = 'none';
-        //   document.getElementById("inspector-outline").style.display = 'flex';
-
-        //   let c = d3.selectAll(".point.selected");
-        //   let r = c.attr("r");
-        //   c.attr("stroke", "none");
-        //   c.attr("stroke-width", 0);
-        //   c.attr("r", r / 2)
-        //   c.attr("class", "point");
-
-
-
-
-
-
-        //        // original values
-        //   let insp = d3.select("#inspector2");
-        //   let cost = insp.attr("cost")
-        //   let ad = insp.attr("ad")
-        //   let debt = insp.attr("debt")
-        //   let inc = insp.attr("inc")
-
-        // document.getElementById(`costText2`).innerHTML = d3.format('$,')(cost)
-        // document.getElementById(`adText2`).innerHTML = d3.format('.000%')(ad)
-        // document.getElementById(`debtText2`).innerHTML = d3.format('$,')(debt)
-        // document.getElementById(`inText2`).innerHTML = d3.format('$,')(inc)
-        //   }     
+          
         })
 
 
         let clearButton = document.getElementById("clearButton")
         clearButton.addEventListener("click", function () {
-          console.log("clear clicked!");
 
-           document.getElementById("inspector").style.display = 'none';
+            document.getElementById("inspector").style.display = 'none';
             document.getElementById("inspector-outline").style.display = 'flex';
             document.getElementById("inspector2").style.display = 'none';
             
@@ -1336,7 +1228,6 @@ var g = svg.append("g")
           let total_values = total.map((d) => d[attribute]);
           let rest_values = rest.map((d) => d[attribute]);
           let minMax = d3.extent(total_values);
-          console.log("extent", minMax);
           let ivy_values = ivies.map((d) => d[attribute]);
 
           let xScale = d3
@@ -1348,7 +1239,6 @@ var g = svg.append("g")
           let numBins = 10;
           let histoGen = d3.histogram().domain(minMax).thresholds(numBins);
 
-          // the smaller rectangles are from the fact that it's not even distribution in the bins right?
           let total_bins = histoGen(total_values);
           let rest_bins = histoGen(rest_values);
           let ivy_bins = histoGen(ivy_values);
@@ -1526,7 +1416,6 @@ var g = svg.append("g")
 
         // Add click event listeners to the arrows
         xArrowLeft.addEventListener("click", function () {
-          console.log("xArrowLeft");
           xLabelIndex = (xLabelIndex - 1) % 5;
           if (xLabelIndex < 0) {
             xLabelIndex = 4;
