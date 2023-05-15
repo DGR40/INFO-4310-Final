@@ -375,6 +375,25 @@
       .school-list-instructions {
         background-color: white !important;
       }
+
+      #clearButton{
+        width:100%;
+        background-color: red;
+        color:white;
+        display:flex;
+        padding-top:8px;
+        padding-bottom:8px;
+        border-radius:6px;
+        justify-content: center;
+        margin-top:10px;
+        cursor: pointer;
+        display: none;
+      }
+
+      #clearButton:hover {
+        color:#002947;
+        transition: fade-in;
+      }
     </style>
   </head>
   <body>
@@ -429,8 +448,12 @@
             <span class="bold">See</span> more info by hovering over schools...<br />
           <span class='bold'>Compare</span> by clicking <span>two</span> schools..</p></div>
 
+           
+
            <div id="compareText"><p>
           <span class='bold'>Compare</span> by clicking <span>2nd</span> school..</p></div>
+
+          <div id="clearButton"><span class='bold'>Clear Both Schools</span></div>
 
           <div id="inspector-outline">
             <p>
@@ -510,6 +533,7 @@
 
              
           </div>
+         
         </div>
       </div>
       <div class="xButtonContainer">
@@ -870,6 +894,7 @@
                    c.attr("class", "point selected2");
                     
                   document.getElementById("delete2").style.display="flex"
+                  document.getElementById("clearButton").style.display="flex"
 
                   addCompareValues(
                     "2",
@@ -937,6 +962,8 @@
 
         document.getElementById("delete2").style.display = "none";
 
+        document.getElementById("clearButton").style.display = "none";
+
         }); 
 
 
@@ -997,7 +1024,37 @@
         })
 
 
+        let clearButton = document.getElementById("clearButton")
+        clearButton.addEventListener("click", function () {
+          console.log("clear clicked!");
 
+           document.getElementById("inspector").style.display = 'none';
+            document.getElementById("inspector-outline").style.display = 'flex';
+            document.getElementById("inspector2").style.display = 'none';
+            
+            document.getElementById("name").innerText = '';
+            document.getElementById("name2").innerText = '';
+
+            document.getElementById("clearButton").style.display = "none"
+
+            // clear circles
+            let c = d3.selectAll(".point.selected");
+            let r = c.attr("r");
+            c.attr("stroke", "none");
+            c.attr("stroke-width", 0);
+            c.attr("r", r / 2)
+            c.attr("class", "point")
+
+            let c1 = d3.selectAll(".point.selected2");
+            let r1 = c1.attr("r");
+            c1.attr("stroke", "none");
+            c1.attr("stroke-width", 0);
+            c1.attr("r", r1 / 2)
+            c1.attr("class", "point")
+
+            // set numSelected = 0 
+            numSelected = 0;
+        })
 
 
         function makeHistogram(svg, attribute, xlabel) {
