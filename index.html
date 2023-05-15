@@ -187,7 +187,7 @@
         border-radius: 10px;
         box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
         height: 340px;
-        background-color: #bbb;
+        background-color: #c2c2c2;
         display: flex;
         justify-content: flex-start;
         flex-direction: column;
@@ -225,7 +225,7 @@
         border-bottom: 1px solid #002947;
       }
       #detail-table2 {
-        color: white;
+        color: #002947;
       }
 
       .comparer {
@@ -403,6 +403,7 @@
         text-decoration: underline;
         cursor: pointer;
         justify-content: center;
+        display: none;
       }
 
       .raceToggle:hover {
@@ -410,7 +411,7 @@
       }
 
       #raceToggle2:hover {
-        color:#002947;
+        color:#6bbcd1;
       }
 
       #race1, #race2 {
@@ -1015,7 +1016,7 @@ var g = svg.append("g")
                   document.getElementById("detail-table").style.display = '';
                   document.getElementById('raceToggle1').innerText = "View Race Demographics"
 
-                  document.getElementById("raceToggle1").style.display = 'flex';
+                  // document.getElementById("raceToggle1").style.display = 'flex';
 
                    makeBarChart(raceData, 1);
 
@@ -1050,7 +1051,7 @@ var g = svg.append("g")
                   document.getElementById("detail-table2").style.display = '';
                   document.getElementById('raceToggle2').innerText = "View Race Demographics"
 
-                  document.getElementById("raceToggle2").display = 'flex';
+                  // document.getElementById("raceToggle2").display = 'flex';
 
                   makeBarChart(raceData, 2);
 
@@ -1101,6 +1102,8 @@ var g = svg.append("g")
                 // set circle to selected
                 c.attr("class", "point selected");
                 if (numSelected == 0) {
+
+                  document.getElementById("raceToggle1").style.display = 'flex';
                   
                   numSelected++;
                   document.getElementById("inspector2-outline").style.display =
@@ -1115,6 +1118,9 @@ var g = svg.append("g")
                 }
                 const name1 = document.getElementById("name").innerText;
                 if (numSelected == 1 && name1 != name) {
+
+                  document.getElementById("raceToggle2").style.display = 'flex';
+
                   let firstSelected = document.getElementById("inspector").style.display == 'flex';
                   console.log(firstSelected, "first selected =");
                   if (firstSelected == true) {
